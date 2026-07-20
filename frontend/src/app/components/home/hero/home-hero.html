@@ -39,7 +39,13 @@
 
     <p class="hero__limite">
       Saldo + Limite:
-      <strong>{{ saldo() | currency: 'BRL' : 'symbol' : '1.2-2' }}</strong>
+      <strong>
+        @if (saldoVisivel()) {
+          {{ saldo() | currency: 'BRL' : 'symbol' : '1.2-2' }}
+        } @else {
+          R$ ●●●●●●
+        }
+      </strong>
     </p>
 
     <a class="btn-extrato" routerLink="/extrato">Acessar extrato</a>
