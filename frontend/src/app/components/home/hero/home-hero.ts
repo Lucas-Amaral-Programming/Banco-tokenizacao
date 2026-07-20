@@ -2,10 +2,11 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { CurrencyPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ContaService } from '../../../services/conta.service';
+import { Icone } from '../../shared/icone/icone';
 
 @Component({
   selector: 'app-home-hero',
-  imports: [CurrencyPipe, RouterLink],
+  imports: [CurrencyPipe, RouterLink, Icone],
   templateUrl: './home-hero.html',
   styleUrl: './home-hero.scss'
 })
