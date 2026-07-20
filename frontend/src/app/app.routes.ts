@@ -12,13 +12,13 @@ export const routes: Routes = [
   { path: 'login', component: Login },
   { path: 'cadastro', component: Cadastro },
   { path: 'home', component: Home, canActivate: [loginGuard] },
+  { path: 'extrato', component: Extrato, canActivate: [loginGuard] },
   {
     path: 'transacoes',
     component: Transacoes,
     canActivate: [loginGuard],
     children: [
       { path: '', redirectTo: 'pix', pathMatch: 'full' },
-      { path: 'extrato', component: Extrato },
       { path: ':tipo', component: FormularioTransacao }
     ]
   }

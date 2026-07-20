@@ -1,0 +1,68 @@
+.resumo {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  padding-left: var(--space-5);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: var(--radius-card);
+  font-family: var(--font-base);
+  overflow: hidden;
+}
+
+.resumo::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: var(--space-3);
+  bottom: var(--space-3);
+  width: 4px;
+  border-radius: var(--radius-pill);
+  background: var(--color-orange-500);
+}
+
+.resumo__bloco {
+  flex: 1 1 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.resumo__ic {
+  flex: 0 0 auto;
+  color: var(--color-orange-500);
+  display: inline-flex;
+}
+
+.resumo__txt {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.resumo__label {
+  font-size: var(--fs-caption);
+  color: var(--color-on-navy-muted);
+}
+
+.resumo__periodo {
+  font-size: var(--fs-body);
+  font-weight: 700;
+  color: var(--color-on-navy);
+}
+
+.resumo__num {
+  font-size: var(--fs-title);
+  font-weight: 700;
+  color: var(--color-orange-500);
+  line-height: 1.1;
+}
+
+.resumo__sep {
+  flex: 0 0 auto;
+  align-self: stretch;
+  width: 1px;
+  background: rgba(255, 255, 255, 0.14);
+}

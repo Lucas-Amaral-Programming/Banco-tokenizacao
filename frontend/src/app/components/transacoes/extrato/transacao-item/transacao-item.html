@@ -1,0 +1,36 @@
+<article class="tx">
+  <div class="tx__topo">
+    <span class="tx__avatar">
+      <app-icone nome="pix" [tamanho]="26" />
+    </span>
+
+    <div class="tx__meio">
+      <h3 class="tx__tipo">{{ transacao().tipoTransacao }}</h3>
+      <span class="tx__conta">Conta: {{ contraParte() }}</span>
+      <span class="tx__data">
+        <app-icone nome="calendario" [tamanho]="14" />
+        {{ transacao().dataHoraTransacao | date: 'dd/MM/yyyy' }} •
+        {{ transacao().dataHoraTransacao | date: 'HH:mm:ss' }}
+      </span>
+      @if (transacao().descricaoTransacao) {
+        <p class="tx__desc">{{ transacao().descricaoTransacao }}</p>
+      }
+    </div>
+
+    <div class="tx__dir">
+      <span class="tx__valor">
+        {{ transacao().valorTransacao | currency: 'BRL' : 'symbol' : '1.2-2' }}
+      </span>
+      <span class="tx__status" [class]="'tx__status--' + classeStatus()">
+        <app-icone nome="check-circle" [tamanho]="16" />
+        {{ transacao().statusTransacao }}
+      </span>
+    </div>
+
+    <app-icone class="tx__chevron" nome="chevron" [tamanho]="20" />
+  </div>
+
+  <div class="tx__rodape">
+    <span class="tx__token">Token: {{ transacao().tokenTransacao }}</span>
+  </div>
+</article>

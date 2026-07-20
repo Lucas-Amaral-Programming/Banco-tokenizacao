@@ -19,7 +19,7 @@
     @for (tipo of tiposTransacao; track tipo) {
       <a [routerLink]="tipo.toLowerCase()" routerLinkActive="ativo">{{ tipo }}</a>
     }
-    <a routerLink="extrato" routerLinkActive="ativo">Extrato</a>
+    <a routerLink="/extrato" routerLinkActive="ativo">Extrato</a>
   </nav>
 
   <router-outlet />

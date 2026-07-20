@@ -1,21 +1,41 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
+import { Location } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { TransacaoResponse } from '../../../models/transacao-response.model';
 import { TransacaoService } from '../../../services/transacao.service';
 import { ContaService } from '../../../services/conta.service';
+import { Icone } from '../../shared/icone/icone';
+import { BottomNav } from '../../home/bottom-nav/bottom-nav';
+import { ExtratoResumo } from './resumo/extrato-resumo';
+import { TransacaoItem } from './transacao-item/transacao-item';
 
 @Component({
   selector: 'app-extrato',
-  imports: [],
+  imports: [RouterLink, Icone, BottomNav, ExtratoResumo, TransacaoItem],
   templateUrl: './extrato.html',
   styleUrl: './extrato.scss'
 })
 export class Extrato {
   private readonly transacaoService = inject(TransacaoService);
   private readonly contaService = inject(ContaService);
+  private readonly location = inject(Location);
 
   protected readonly transacoes = signal<TransacaoResponse[]>([]);
   protected readonly carregando = signal(false);
   protected readonly erro = signal<string | null>(null);
+
+  protected readonly numeroContaAtual = computed(
+    () => this.contaService.contaAtual()?.numeroConta ?? null
+  );
+
+  private readonly datasOrdenadas = computed(() =>
+    this.transacoes()
+      .map((transacao) => transacao.dataHoraTransacao)
+      .sort()
+  );
+
+  protected readonly periodoInicio = computed(() => this.datasOrdenadas().at(0) ?? null);
+  protected readonly periodoFim = computed(() => this.datasOrdenadas().at(-1) ?? null);
 
   constructor() {
     this.carregando.set(true);
@@ -31,10 +51,7 @@ export class Extrato {
     });
   }
 
-  protected contraParte(transacao: TransacaoResponse): string {
-    const numeroAtual = this.contaService.contaAtual()?.numeroConta;
-    const enviada = transacao.numeroContaOrigem === numeroAtual;
-    const outra = enviada ? transacao.numeroContaDestino : transacao.numeroContaOrigem;
-    return outra ?? '-';
+  voltar(): void {
+    this.location.back();
   }
 }

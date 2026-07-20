@@ -1,0 +1,31 @@
+<div class="resumo">
+  <div class="resumo__bloco">
+    <span class="resumo__ic">
+      <app-icone nome="calendario" [tamanho]="22" />
+    </span>
+    <div class="resumo__txt">
+      <span class="resumo__label">Período selecionado</span>
+      <strong class="resumo__periodo">
+        @if (inicio() && fim()) {
+          {{ inicio() | date: 'dd/MM/yyyy' }} a {{ fim() | date: 'dd/MM/yyyy' }}
+        } @else {
+          —
+        }
+      </strong>
+    </div>
+  </div>
+
+  <div class="resumo__sep"></div>
+
+  <div class="resumo__bloco">
+    <span class="resumo__ic">
+      <app-icone nome="transferencia" [tamanho]="22" />
+    </span>
+    <div class="resumo__txt">
+      <strong class="resumo__num">{{ total() }}</strong>
+      <span class="resumo__label">
+        {{ total() === 1 ? 'movimentação' : 'movimentações' }}
+      </span>
+    </div>
+  </div>
+</div>

@@ -1,10 +1,11 @@
 import { Component, input } from '@angular/core';
 import { CurrencyPipe } from '@angular/common';
 import { ContaResponse, TipoConta } from '../../../models/conta.model';
+import { Icone } from '../../shared/icone/icone';
 
 @Component({
   selector: 'app-conta-card',
-  imports: [CurrencyPipe],
+  imports: [CurrencyPipe, Icone],
   templateUrl: './conta-card.html',
   styleUrl: './conta-card.scss'
 })

@@ -1,0 +1,118 @@
+.tx {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  padding: var(--space-4);
+  font-family: var(--font-base);
+}
+
+.tx__topo {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+.tx__avatar {
+  flex: 0 0 auto;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-pill);
+  background: var(--color-success-bg);
+  color: var(--color-success);
+  display: grid;
+  place-items: center;
+}
+
+.tx__meio {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.tx__tipo {
+  margin: 0;
+  font-size: var(--fs-title);
+  font-weight: 700;
+  color: var(--color-text-strong);
+}
+
+.tx__conta {
+  font-size: var(--fs-label);
+  color: var(--color-text-muted);
+}
+
+.tx__data {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--fs-caption);
+  color: var(--color-text-muted);
+}
+
+.tx__desc {
+  margin: var(--space-1) 0 0;
+  font-size: var(--fs-body);
+  font-weight: 600;
+  color: var(--color-text-strong);
+}
+
+.tx__dir {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-2);
+}
+
+.tx__valor {
+  font-size: var(--fs-title);
+  font-weight: 700;
+  color: var(--color-text-strong);
+  white-space: nowrap;
+}
+
+.tx__status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-pill);
+  font-size: var(--fs-caption);
+  font-weight: 700;
+}
+
+.tx__status--ok {
+  background: var(--color-success-bg);
+  color: var(--color-success);
+}
+
+.tx__status--pendente {
+  background: var(--color-warning-bg);
+  color: var(--color-warning);
+}
+
+.tx__status--erro {
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+}
+
+.tx__chevron {
+  flex: 0 0 auto;
+  align-self: center;
+  color: var(--color-text-muted);
+}
+
+.tx__rodape {
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border);
+}
+
+.tx__token {
+  font-size: var(--fs-caption);
+  color: var(--color-text-muted);
+  word-break: break-all;
+}

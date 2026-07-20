@@ -1,33 +1,46 @@
-<section class="extrato">
-  <h2>Extrato</h2>
+<main class="tela">
+  <header class="hero">
+    <div class="hero__top">
+      <button class="icon-btn" type="button" (click)="voltar()" aria-label="Voltar">
+        <app-icone nome="seta-esquerda" [tamanho]="22" />
+      </button>
 
-  @if (carregando()) {
-    <p>Carregando...</p>
-  } @else if (erro(); as mensagem) {
-    <p class="erro">{{ mensagem }}</p>
-  } @else if (transacoes().length === 0) {
-    <p>Nenhuma transacao encontrada.</p>
-  } @else {
-    <ul class="lista">
+      <img class="hero__logo" src="logo-foursys.png" alt="foursys" />
+
+      <button class="icon-btn" type="button" aria-label="Buscar">
+        <app-icone nome="buscar" [tamanho]="22" />
+      </button>
+    </div>
+
+    <h1 class="hero__titulo">Extrato</h1>
+
+    <nav class="pills">
+      <a class="pill" routerLink="/transacoes/pix">PIX</a>
+      <a class="pill" routerLink="/transacoes/deposito">Depósito</a>
+      <a class="pill" routerLink="/transacoes/saque">Saque</a>
+      <a class="pill pill--ativa" routerLink="/extrato">Extrato</a>
+    </nav>
+
+    <app-extrato-resumo
+      [inicio]="periodoInicio()"
+      [fim]="periodoFim()"
+      [total]="transacoes().length"
+    />
+  </header>
+
+  <section class="lista">
+    @if (carregando()) {
+      <p class="aviso">Carregando...</p>
+    } @else if (erro(); as mensagem) {
+      <p class="aviso aviso--erro">{{ mensagem }}</p>
+    } @else if (transacoes().length === 0) {
+      <p class="aviso">Nenhuma transação encontrada.</p>
+    } @else {
       @for (transacao of transacoes(); track transacao.tokenTransacao) {
-        <li class="item">
-          <div class="linha">
-            <strong>{{ transacao.tipoTransacao }}</strong>
-            <span class="valor">R$ {{ transacao.valorTransacao }}</span>
-          </div>
-          <div class="linha detalhes">
-            <span>Conta: {{ contraParte(transacao) }}</span>
-            <span>{{ transacao.statusTransacao }}</span>
-          </div>
-          <div class="linha detalhes">
-            <span>{{ transacao.dataHoraTransacao }}</span>
-          </div>
-          @if (transacao.descricaoTransacao) {
-            <p class="descricao">{{ transacao.descricaoTransacao }}</p>
-          }
-          <p class="token">Token: {{ transacao.tokenTransacao }}</p>
-        </li>
+        <app-transacao-item [transacao]="transacao" [numeroContaAtual]="numeroContaAtual()" />
       }
-    </ul>
-  }
-</section>
+    }
+  </section>
+
+  <app-bottom-nav />
+</main>
