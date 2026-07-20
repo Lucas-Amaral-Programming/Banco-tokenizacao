@@ -1,13 +1,13 @@
 package br.com.foursys.tokenizacao.transacoes.controller;
 
 import br.com.foursys.tokenizacao.transacoes.dto.request.CadastroContaRequest;
-import br.com.foursys.tokenizacao.transacoes.dto.request.LoginContaRequest;
 import br.com.foursys.tokenizacao.transacoes.dto.response.ContaResponse;
+import br.com.foursys.tokenizacao.transacoes.security.ContaPrincipal;
 import br.com.foursys.tokenizacao.transacoes.service.ContaService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,15 +29,9 @@ public class ContaController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<ContaResponse> login(@RequestBody LoginContaRequest request) {
-        ContaResponse response = contaService.autenticar(request);
-        return ResponseEntity.ok(response);
-    }
-
-    @GetMapping("/{numeroConta}")
-    public ResponseEntity<ContaResponse> buscar(@PathVariable String numeroConta) {
-        ContaResponse response = contaService.buscarPorNumero(numeroConta);
-        return ResponseEntity.ok(response);
+    @GetMapping("/me")
+    public ResponseEntity<ContaResponse> me(Authentication autenticacao) {
+        ContaPrincipal principal = (ContaPrincipal) autenticacao.getPrincipal();
+        return ResponseEntity.ok(contaService.buscarPorNumero(principal.getNumeroConta()));
     }
 }

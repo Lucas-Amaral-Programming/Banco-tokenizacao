@@ -1,0 +1,56 @@
+.conta {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  cursor: pointer;
+  text-align: left;
+  font-family: var(--font-base);
+}
+
+.conta__ic {
+  flex: 0 0 auto;
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-sm);
+  background: var(--color-navy-800);
+  color: var(--color-orange-500);
+  display: grid;
+  place-items: center;
+}
+
+.conta__info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.conta__nome {
+  font-size: var(--fs-body);
+  font-weight: 600;
+  color: var(--color-text-strong);
+}
+
+.conta__meta {
+  font-size: var(--fs-caption);
+  color: var(--color-text-muted);
+}
+
+.conta__saldo {
+  font-size: var(--fs-body);
+  font-weight: 700;
+  color: var(--color-text-strong);
+  white-space: nowrap;
+}
+
+.conta__chevron {
+  flex: 0 0 auto;
+  color: var(--color-orange-500);
+}

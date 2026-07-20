@@ -4,22 +4,24 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import br.com.foursys.tokenizacao.transacoes.exception.SaldoInsuficienteException;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import org.hibernate.annotations.Check;
 
 @Entity
 @Table(name = "conta")
+@Check(constraints = "saldo_conta >= 0")
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -58,4 +60,19 @@ public class Conta {
 
     @Column(name = "data_abertura", nullable = false)
     private LocalDateTime dataAbertura;
+
+    @Version
+    @Column(name = "versao_conta", nullable = false)
+    private Long versaoConta;
+
+    public void debitar(BigDecimal valor) {
+        if (saldoConta.compareTo(valor) < 0) {
+            throw new SaldoInsuficienteException();
+        }
+        this.saldoConta = this.saldoConta.subtract(valor);
+    }
+
+    public void creditar(BigDecimal valor) {
+        this.saldoConta = this.saldoConta.add(valor);
+    }
 }

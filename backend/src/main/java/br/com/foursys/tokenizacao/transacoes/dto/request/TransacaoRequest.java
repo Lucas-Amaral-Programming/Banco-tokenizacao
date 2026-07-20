@@ -5,7 +5,6 @@ import java.math.BigDecimal;
 
 public record TransacaoRequest(
         TipoTransacao tipoTransacao,
-        String numeroContaOrigem,
         String numeroContaDestino,
         BigDecimal valorTransacao,
         String descricaoTransacao

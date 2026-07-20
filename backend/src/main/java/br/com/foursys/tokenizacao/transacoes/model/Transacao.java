@@ -11,6 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
@@ -18,9 +19,14 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Check;
 
 @Entity
-@Table(name = "transacao")
+@Table(name = "transacao",
+        uniqueConstraints = @UniqueConstraint(
+                name = "uk_idempotencia",
+                columnNames = {"id_conta_solicitante", "idempotency_key"}))
+@Check(constraints = "valor_transacao > 0")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -47,6 +53,16 @@ public class Transacao {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_conta_destino", nullable = true)
     private Conta contaDestino;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "id_conta_solicitante", nullable = false)
+    private Conta contaSolicitante;
+
+    @Column(name = "idempotency_key", nullable = false, length = 36)
+    private String idempotencyKey;
+
+    @Column(name = "fingerprint_requisicao", nullable = false, length = 64)
+    private String fingerprintRequisicao;
 
     @Column(name = "valor_transacao", nullable = false, precision = 15, scale = 2)
     private BigDecimal valorTransacao;

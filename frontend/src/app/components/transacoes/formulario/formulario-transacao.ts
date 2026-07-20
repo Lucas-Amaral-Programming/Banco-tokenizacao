@@ -47,29 +47,55 @@ export class FormularioTransacao {
   protected readonly erro = signal<string | null>(null);
   protected readonly carregando = signal(false);
 
+  private static readonly CHAVE_STORAGE = 'transacao-pendente';
+  private chaveIdempotencia: string | null = null;
+  private assinaturaChave: string | null = null;
+
+  constructor() {
+    const pendente = sessionStorage.getItem(FormularioTransacao.CHAVE_STORAGE);
+    if (pendente) {
+      try {
+        const dados = JSON.parse(pendente) as { chave: string; assinatura: string };
+        this.chaveIdempotencia = dados.chave;
+        this.assinaturaChave = dados.assinatura;
+      } catch {
+        sessionStorage.removeItem(FormularioTransacao.CHAVE_STORAGE);
+      }
+    }
+  }
+
   enviar(): void {
+    if (this.carregando()) {
+      return;
+    }
+
     const tipo = this.tipoTransacao();
     if (!tipo) {
       this.erro.set('Tipo de transacao invalido.');
       return;
     }
 
+    const destino = this.exigeDestino() ? this.numeroContaDestino : '';
+    const valor = this.paraNumero(this.valorTransacaoTexto);
+
     const request: TransacaoRequest = {
       tipoTransacao: tipo,
-      numeroContaOrigem: this.exigeOrigem() ? (this.contaAtual()?.numeroConta ?? '') : '',
-      numeroContaDestino: this.exigeDestino() ? this.numeroContaDestino : '',
-      valorTransacao: this.paraNumero(this.valorTransacaoTexto),
+      numeroContaDestino: destino,
+      valorTransacao: valor,
       descricaoTransacao: this.descricao
     };
+
+    const chave = this.obterChaveIdempotencia(tipo, destino, valor);
 
     this.resposta.set(null);
     this.erro.set(null);
     this.carregando.set(true);
 
-    this.transacaoService.criarTransacao(request).subscribe({
+    this.transacaoService.criarTransacao(request, chave).subscribe({
       next: (transacao) => {
         this.resposta.set(transacao);
         this.carregando.set(false);
+        this.limparChaveIdempotencia();
         this.limparCampos();
       },
       error: (falha) => {
@@ -77,6 +103,25 @@ export class FormularioTransacao {
         this.carregando.set(false);
       }
     });
+  }
+
+  private obterChaveIdempotencia(tipo: string, destino: string, valor: number): string {
+    const assinatura = `${tipo}|${destino}|${valor}`;
+    if (!this.chaveIdempotencia || this.assinaturaChave !== assinatura) {
+      this.chaveIdempotencia = crypto.randomUUID();
+      this.assinaturaChave = assinatura;
+      sessionStorage.setItem(
+        FormularioTransacao.CHAVE_STORAGE,
+        JSON.stringify({ chave: this.chaveIdempotencia, assinatura })
+      );
+    }
+    return this.chaveIdempotencia;
+  }
+
+  private limparChaveIdempotencia(): void {
+    this.chaveIdempotencia = null;
+    this.assinaturaChave = null;
+    sessionStorage.removeItem(FormularioTransacao.CHAVE_STORAGE);
   }
 
   private limparCampos(): void {

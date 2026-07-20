@@ -1,0 +1,140 @@
+.secao {
+  font-family: var(--font-base);
+}
+
+.secao__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-3);
+}
+
+.secao__titulo {
+  position: relative;
+  margin: 0;
+  padding-left: var(--space-3);
+  font-size: var(--fs-title);
+  font-weight: 700;
+  color: var(--color-text-strong);
+}
+
+.secao__titulo::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 18px;
+  border-radius: var(--radius-pill);
+  background: var(--color-orange-500);
+}
+
+.secao__link {
+  background: none;
+  border: 0;
+  cursor: pointer;
+  padding: 0;
+  font-family: var(--font-base);
+  font-size: var(--fs-label);
+  font-weight: 600;
+  color: var(--color-orange-500);
+}
+
+.cartao {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  cursor: pointer;
+  text-align: left;
+  font-family: var(--font-base);
+}
+
+.mini {
+  flex: 0 0 auto;
+  position: relative;
+  width: 76px;
+  height: 48px;
+  border-radius: var(--radius-sm);
+  background: var(--color-navy-800);
+  padding: var(--space-2);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.mini__logo {
+  height: 10px;
+  width: auto;
+  object-fit: contain;
+}
+
+.mini__num {
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: var(--color-on-navy);
+}
+
+.mini__band {
+  position: absolute;
+  right: var(--space-2);
+  bottom: var(--space-2);
+  display: inline-flex;
+}
+
+.mini__band-a,
+.mini__band-b {
+  width: 12px;
+  height: 12px;
+  border-radius: var(--radius-pill);
+}
+
+.mini__band-a {
+  background: #eb001b;
+}
+
+.mini__band-b {
+  background: #f79e1b;
+  margin-left: -5px;
+  opacity: 0.9;
+}
+
+.cartao__info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.cartao__nome {
+  font-size: var(--fs-body);
+  font-weight: 600;
+  color: var(--color-text-strong);
+}
+
+.cartao__meta {
+  font-size: var(--fs-caption);
+  color: var(--color-text-muted);
+}
+
+.cartao__fatura {
+  font-size: var(--fs-caption);
+  color: var(--color-orange-500);
+}
+
+.cartao__fatura strong {
+  color: var(--color-text-strong);
+  font-weight: 700;
+}
+
+.cartao__chevron {
+  flex: 0 0 auto;
+  color: var(--color-orange-500);
+}

@@ -7,13 +7,15 @@ import { TransacaoResponse } from '../models/transacao-response.model';
 @Injectable({ providedIn: 'root' })
 export class TransacaoService {
   private readonly http = inject(HttpClient);
-  private readonly urlBase = 'http://localhost:8080/api/transacoes';
+  private readonly urlBase = '/api/transacoes';
 
-  criarTransacao(request: TransacaoRequest): Observable<TransacaoResponse> {
-    return this.http.post<TransacaoResponse>(this.urlBase, request);
+  criarTransacao(request: TransacaoRequest, idempotencyKey: string): Observable<TransacaoResponse> {
+    return this.http.post<TransacaoResponse>(this.urlBase, request, {
+      headers: { 'Idempotency-Key': idempotencyKey }
+    });
   }
 
-  listarPorConta(numeroConta: string): Observable<TransacaoResponse[]> {
-    return this.http.get<TransacaoResponse[]>(`${this.urlBase}?conta=${numeroConta}`);
+  listarExtrato(): Observable<TransacaoResponse[]> {
+    return this.http.get<TransacaoResponse[]>(this.urlBase);
   }
 }

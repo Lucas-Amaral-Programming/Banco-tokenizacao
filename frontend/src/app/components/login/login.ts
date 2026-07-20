@@ -30,7 +30,7 @@ export class Login {
     this.contaService.login(this.credenciais).subscribe({
       next: () => {
         this.carregando.set(false);
-        this.router.navigate(['/transacoes']);
+        this.router.navigate(['/home']);
       },
       error: (falha) => {
         this.erro.set(falha?.error?.mensagem ?? 'Nao foi possivel entrar.');

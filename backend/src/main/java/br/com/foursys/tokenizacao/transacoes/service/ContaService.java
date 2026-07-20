@@ -1,12 +1,10 @@
 package br.com.foursys.tokenizacao.transacoes.service;
 
 import br.com.foursys.tokenizacao.transacoes.dto.request.CadastroContaRequest;
-import br.com.foursys.tokenizacao.transacoes.dto.request.LoginContaRequest;
 import br.com.foursys.tokenizacao.transacoes.dto.response.ContaResponse;
 import br.com.foursys.tokenizacao.transacoes.exception.ContaNaoEncontradaException;
 import br.com.foursys.tokenizacao.transacoes.exception.CpfInvalidoException;
 import br.com.foursys.tokenizacao.transacoes.exception.CpfJaCadastradoException;
-import br.com.foursys.tokenizacao.transacoes.exception.CredenciaisInvalidasException;
 import br.com.foursys.tokenizacao.transacoes.exception.EmailJaCadastradoException;
 import br.com.foursys.tokenizacao.transacoes.model.Conta;
 import br.com.foursys.tokenizacao.transacoes.util.ValidadorCpf;
@@ -56,18 +54,6 @@ public class ContaService {
                 .build();
 
         return montarResposta(contaRepository.save(conta));
-    }
-
-    @Transactional(readOnly = true)
-    public ContaResponse autenticar(LoginContaRequest request) {
-        Conta conta = contaRepository.findByCpf(apenasDigitos(request.cpf()))
-                .orElseThrow(CredenciaisInvalidasException::new);
-
-        if (!passwordEncoder.matches(request.senha(), conta.getSenhaConta())) {
-            throw new CredenciaisInvalidasException();
-        }
-
-        return montarResposta(conta);
     }
 
     @Transactional(readOnly = true)

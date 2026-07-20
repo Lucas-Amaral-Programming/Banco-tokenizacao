@@ -8,3 +8,4 @@ VALUES
     ('00022', 'Joao Lima',      '22222222222', 'joao.lima@teste.com',      'POUPANCA', 5000.00, 'ATIVA',     '$2b$10$euP/4m2kX4eFdx6OMptwbe1ivrqyuLGu30F0ZdFPmNpltNjri0LFa', NOW()),
     ('00033', 'Carlos Pereira', '33333333333', 'carlos.pereira@teste.com', 'CORRENTE', 5000.00, 'BLOQUEADA', '$2b$10$euP/4m2kX4eFdx6OMptwbe1ivrqyuLGu30F0ZdFPmNpltNjri0LFa', NOW());
 
+

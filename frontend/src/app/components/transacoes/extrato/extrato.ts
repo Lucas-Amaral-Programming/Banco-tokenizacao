@@ -18,13 +18,8 @@ export class Extrato {
   protected readonly erro = signal<string | null>(null);
 
   constructor() {
-    const conta = this.contaService.contaAtual();
-    if (!conta) {
-      return;
-    }
-
     this.carregando.set(true);
-    this.transacaoService.listarPorConta(conta.numeroConta).subscribe({
+    this.transacaoService.listarExtrato().subscribe({
       next: (lista) => {
         this.transacoes.set(lista);
         this.carregando.set(false);

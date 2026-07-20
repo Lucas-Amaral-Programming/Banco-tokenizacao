@@ -1,5 +1,6 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
+import { map } from 'rxjs';
 import { ContaService } from '../services/conta.service';
 
 export const loginGuard: CanActivateFn = () => {
@@ -10,5 +11,7 @@ export const loginGuard: CanActivateFn = () => {
     return true;
   }
 
-  return router.createUrlTree(['/login']);
+  return contaService.carregarSessao().pipe(
+    map((conta) => (conta ? true : router.createUrlTree(['/login'])))
+  );
 };

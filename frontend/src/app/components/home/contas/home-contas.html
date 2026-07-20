@@ -1,0 +1,12 @@
+<section class="secao">
+  <header class="secao__head">
+    <h2 class="secao__titulo">Minhas contas</h2>
+    <button class="secao__link" type="button">Ver todas</button>
+  </header>
+
+  @if (conta(); as c) {
+    <app-conta-card [conta]="c" />
+  } @else {
+    <p class="vazio">Nenhuma conta encontrada.</p>
+  }
+</section>

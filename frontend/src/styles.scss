@@ -1,5 +1,49 @@
 /* You can add global styles to this file, and also import other style files */
 
+:root {
+  /* ---- Cores ---- */
+  --color-navy-900: #0b2a4a;
+  --color-navy-800: #143c66;
+  --color-orange-500: #f47b20;
+  --color-orange-600: #e06a12;
+  --color-surface: #ffffff;
+  --color-bg: #f4f6f9;
+
+  --color-text-strong: #0e1b2a;
+  --color-text: #33404f;
+  --color-text-muted: #7a8794;
+  --color-on-navy: #ffffff;
+  --color-on-navy-muted: #b7c6d6;
+
+  --color-border: #e6eaf0;
+
+  /* ---- Raios ---- */
+  --radius-sheet: 24px;
+  --radius-card: 16px;
+  --radius-sm: 12px;
+  --radius-pill: 999px;
+
+  /* ---- Sombras ---- */
+  --shadow-card: 0 2px 12px rgba(11, 42, 74, 0.06);
+  --shadow-float: 0 8px 24px rgba(11, 42, 74, 0.12);
+
+  /* ---- Espacamentos ---- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+
+  /* ---- Tipografia ---- */
+  --font-base: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --fs-balance: 34px;
+  --fs-title: 18px;
+  --fs-body: 15px;
+  --fs-label: 13px;
+  --fs-caption: 12px;
+}
+
 * {
   box-sizing: border-box;
 }

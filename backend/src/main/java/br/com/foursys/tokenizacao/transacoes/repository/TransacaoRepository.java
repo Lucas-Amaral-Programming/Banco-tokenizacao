@@ -13,7 +13,13 @@ public interface TransacaoRepository extends JpaRepository<Transacao, Long> {
 
     boolean existsByTokenTransacao(String tokenTransacao);
 
-    @Query("select t from Transacao t where t.contaOrigem.numeroConta = :numero "
-            + "or t.contaDestino.numeroConta = :numero order by t.dataHoraTransacao desc")
+    Optional<Transacao> findByContaSolicitante_IdContaAndIdempotencyKey(
+            Long idContaSolicitante, String idempotencyKey);
+
+    @Query("select t from Transacao t "
+            + "left join t.contaOrigem o "
+            + "left join t.contaDestino d "
+            + "where o.numeroConta = :numero or d.numeroConta = :numero "
+            + "order by t.dataHoraTransacao desc")
     List<Transacao> buscarPorConta(@Param("numero") String numeroConta);
 }

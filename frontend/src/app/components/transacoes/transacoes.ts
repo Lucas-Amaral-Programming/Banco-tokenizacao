@@ -24,13 +24,8 @@ export class Transacoes {
   ];
 
   verSaldo(): void {
-    const conta = this.contaAtual();
-    if (!conta) {
-      return;
-    }
-
     this.carregandoSaldo.set(true);
-    this.contaService.consultarConta(conta.numeroConta).subscribe({
+    this.contaService.atualizarSaldo().subscribe({
       next: () => {
         this.saldoVisivel.set(true);
         this.carregandoSaldo.set(false);
@@ -40,7 +35,9 @@ export class Transacoes {
   }
 
   sair(): void {
-    this.contaService.logout();
-    this.router.navigate(['/login']);
+    this.contaService.logout().subscribe({
+      next: () => this.router.navigate(['/login']),
+      error: () => this.router.navigate(['/login'])
+    });
   }
 }

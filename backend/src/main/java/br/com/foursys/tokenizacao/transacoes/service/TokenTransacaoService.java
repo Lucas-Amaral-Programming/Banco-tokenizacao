@@ -1,7 +1,7 @@
 package br.com.foursys.tokenizacao.transacoes.service;
 
-import br.com.foursys.tokenizacao.transacoes.dto.request.TransacaoRequest;
 import br.com.foursys.tokenizacao.transacoes.repository.TransacaoRepository;
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -21,19 +21,19 @@ public class TokenTransacaoService {
         this.transacaoRepository = transacaoRepository;
     }
 
-    public String gerarToken(TransacaoRequest request) {
+    public String gerarToken(String numeroContaOrigem, String numeroContaDestino, BigDecimal valor) {
         String tokenGerado;
         do {
-            tokenGerado = montarToken(request);
+            tokenGerado = montarToken(numeroContaOrigem, numeroContaDestino, valor);
         } while (transacaoRepository.existsByTokenTransacao(tokenGerado));
         return tokenGerado;
     }
 
-    private String montarToken(TransacaoRequest request) {
+    private String montarToken(String numeroContaOrigem, String numeroContaDestino, BigDecimal valor) {
         String base = String.join("|",
-                request.numeroContaOrigem(),
-                request.numeroContaDestino(),
-                String.valueOf(request.valorTransacao()),
+                String.valueOf(numeroContaOrigem),
+                String.valueOf(numeroContaDestino),
+                String.valueOf(valor),
                 LocalDateTime.now().toString(),
                 UUID.randomUUID().toString());
 
