@@ -1,0 +1,28 @@
+<app-layout-auth tituloCartao="Entrar">
+  <form class="formulario" (submit)="entrar(); $event.preventDefault()">
+    <app-campo-formulario
+      rotulo="CPF" icone="documento" mascara="cpf"
+      placeholder="Digite seu CPF"
+      [(valor)]="credenciais.cpf" />
+
+    <app-campo-formulario
+      rotulo="Senha" icone="cadeado" tipo="senha"
+      placeholder="Digite sua senha"
+      [(valor)]="credenciais.senha" />
+
+    <button class="botao-principal" type="submit" [disabled]="carregando()">
+      {{ carregando() ? 'Entrando...' : 'Entrar' }}
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+    </button>
+  </form>
+
+  @if (erro(); as mensagem) {
+    <p class="erro">{{ mensagem }}</p>
+  }
+
+  <div class="ou"><span>ou</span></div>
+
+  <p class="rodape-form">
+    Nao tem conta? <a routerLink="/cadastro">Cadastre-se</a>
+  </p>
+</app-layout-auth>

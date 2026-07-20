@@ -1,0 +1,109 @@
+$laranja: #f4581e;
+$navy: #16304c;
+$cinza: #6b7280;
+
+.subtitulo-form {
+  margin: -0.5rem 0 1rem;
+  color: $cinza;
+}
+
+.formulario {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.botao-principal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  margin-top: 0.5rem;
+  padding: 0.9rem;
+  border: none;
+  border-radius: 12px;
+  background: $laranja;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.15s;
+}
+
+.botao-principal:hover {
+  background: #e04d16;
+}
+
+.botao-principal:disabled {
+  opacity: 0.7;
+  cursor: default;
+}
+
+.botao-principal svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: #fff;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ou {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: $cinza;
+  font-size: 0.85rem;
+  margin: 1.25rem 0 0.5rem;
+}
+
+.ou::before,
+.ou::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: #eceef2;
+}
+
+.ou span {
+  padding: 0 0.75rem;
+}
+
+.rodape-form {
+  text-align: center;
+  font-size: 0.9rem;
+  color: $cinza;
+  margin: 0;
+}
+
+.rodape-form a {
+  color: $laranja;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.erro {
+  margin: 0.5rem 0 0;
+  color: #b71c1c;
+  text-align: center;
+}
+
+.sucesso {
+  text-align: center;
+}
+
+.sucesso .numero {
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: 3px;
+  color: $laranja;
+  margin: 0.5rem 0;
+}
+
+.sucesso .aviso {
+  color: $cinza;
+  margin-bottom: 1.5rem;
+}

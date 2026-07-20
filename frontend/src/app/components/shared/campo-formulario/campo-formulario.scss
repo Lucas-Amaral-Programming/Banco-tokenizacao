@@ -1,0 +1,82 @@
+$laranja: #f4581e;
+$texto: #1f2a37;
+$cinza: #6b7280;
+$borda: #e3e6eb;
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.rotulo {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: $texto;
+}
+
+.entrada {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1px solid $borda;
+  border-radius: 12px;
+  padding: 0 0.85rem;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.entrada:focus-within {
+  border-color: $laranja;
+  box-shadow: 0 0 0 3px rgba(244, 88, 30, 0.12);
+}
+
+.icone-campo {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  fill: none;
+  stroke: $cinza;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.entrada input,
+.entrada select {
+  flex: 1;
+  border: none;
+  outline: none;
+  padding: 0.65rem 0.2rem;
+  font-size: 1rem;
+  background: transparent;
+  color: $texto;
+}
+
+.entrada input::-ms-reveal,
+.entrada input::-ms-clear {
+  display: none;
+}
+
+.olho {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  display: grid;
+  place-items: center;
+}
+
+.olho svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: $cinza;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ajuda {
+  font-size: 0.8rem;
+  color: $cinza;
+}

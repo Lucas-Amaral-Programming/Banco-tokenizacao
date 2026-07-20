@@ -1,0 +1,26 @@
+<section class="transacoes">
+  <header class="topo">
+    <h1>Transacoes</h1>
+
+    @if (contaAtual(); as conta) {
+      <div class="saldo">
+        <button type="button" (click)="verSaldo()" [disabled]="carregandoSaldo()">
+          {{ carregandoSaldo() ? 'Consultando...' : 'Ver saldo' }}
+        </button>
+        @if (saldoVisivel()) {
+          <span class="valor">Saldo: R$ {{ conta.saldoConta }}</span>
+        }
+        <button type="button" class="sair" (click)="sair()">Sair</button>
+      </div>
+    }
+  </header>
+
+  <nav class="menu-tipos">
+    @for (tipo of tiposTransacao; track tipo) {
+      <a [routerLink]="tipo.toLowerCase()" routerLinkActive="ativo">{{ tipo }}</a>
+    }
+    <a routerLink="extrato" routerLinkActive="ativo">Extrato</a>
+  </nav>
+
+  <router-outlet />
+</section>

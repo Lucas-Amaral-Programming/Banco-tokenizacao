@@ -1,0 +1,43 @@
+<div class="pagina">
+  <header class="topo">
+    <app-logo />
+  </header>
+
+  <div class="conteudo">
+    <section class="marketing">
+      <h2>Sua vida financeira<br /><span class="destaque">mais simples e livre.</span></h2>
+      <p>Abra sua conta digital gratuita e aproveite todas as vantagens que a Foursys oferece para voce.</p>
+    </section>
+
+    <div class="cartao">
+      <div class="form-area">
+        <h1>{{ tituloCartao() }}</h1>
+        <span class="risco"></span>
+        <ng-content />
+      </div>
+
+      <div class="divisor"></div>
+
+      <app-beneficios />
+    </div>
+  </div>
+
+  <footer class="rodape">
+    <div class="rodape-conteudo">
+      <span class="item">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <rect x="5" y="11" width="14" height="9" rx="2" />
+          <path d="M8 11V8a4 4 0 018 0v3" />
+        </svg>
+        Seguranca de ponta a ponta
+      </span>
+      <span class="sep">|</span>
+      <span class="item">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 12a8 8 0 0116 0v4a2 2 0 01-2 2h-1v-6h3M4 12v4a2 2 0 002 2h1v-6H4" />
+        </svg>
+        Suporte 24h
+      </span>
+    </div>
+  </footer>
+</div>

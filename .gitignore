@@ -1,0 +1,29 @@
+# --- Backend (Maven / Java) ---
+backend/target/
+*.class
+*.jar
+*.war
+!backend/.mvn/wrapper/maven-wrapper.jar
+
+# --- Frontend (Node / Angular) ---
+# (frontend/.gitignore cobre node_modules, dist, .angular/cache)
+node_modules/
+
+# --- Graphify (artefato gerado localmente) ---
+graphify-out/
+
+# --- IDEs / editores ---
+.idea/
+.vscode/
+*.iml
+
+# --- Claude Code (config local) ---
+.claude/
+
+# --- Logs ---
+*.log
+logs/
+
+# --- Sistema operacional ---
+.DS_Store
+Thumbs.db

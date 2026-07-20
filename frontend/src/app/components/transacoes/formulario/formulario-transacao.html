@@ -1,0 +1,50 @@
+@if (tipoTransacao(); as tipo) {
+  <form class="formulario" (ngSubmit)="enviar()">
+    <h2>{{ tipo }}</h2>
+
+    @if (exigeOrigem()) {
+      <p class="conta-origem">
+        Origem: <strong>{{ contaAtual()?.nomeTitular }}</strong>
+      </p>
+    }
+
+    @if (exigeDestino()) {
+      <app-campo-formulario
+        [rotulo]="tipo === 'PIX' ? 'Chave PIX (CPF ou e-mail)' : 'Numero da conta de destino'"
+        icone="documento"
+        [mascara]="tipo === 'PIX' ? 'chave-pix' : null"
+        [placeholder]="tipo === 'PIX' ? 'Ex: nome@email.com ou CPF' : 'Ex: 00011'"
+        [(valor)]="numeroContaDestino" />
+    }
+
+    <app-campo-formulario
+      rotulo="Valor" icone="banco" mascara="moeda"
+      [(valor)]="valorTransacaoTexto" />
+
+    <app-campo-formulario
+      rotulo="Descricao (opcional)" icone="documento"
+      placeholder="Ex: pagamento do almoco"
+      [(valor)]="descricao" />
+
+    <button type="submit" [disabled]="carregando()">
+      {{ carregando() ? 'Enviando...' : 'Enviar' }}
+    </button>
+  </form>
+
+  @if (resposta(); as transacao) {
+    <div class="resultado sucesso">
+      <h3>Transacao {{ transacao.statusTransacao }}</h3>
+      <p><strong>Token:</strong> {{ transacao.tokenTransacao }}</p>
+      <p><strong>Valor:</strong> {{ transacao.valorTransacao }}</p>
+      <p><strong>Data/hora:</strong> {{ transacao.dataHoraTransacao }}</p>
+    </div>
+  }
+
+  @if (erro(); as mensagem) {
+    <div class="resultado erro">
+      <p>{{ mensagem }}</p>
+    </div>
+  }
+} @else {
+  <p class="resultado erro">Tipo de transacao invalido.</p>
+}

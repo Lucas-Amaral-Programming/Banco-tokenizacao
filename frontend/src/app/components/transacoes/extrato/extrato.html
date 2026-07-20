@@ -1,0 +1,33 @@
+<section class="extrato">
+  <h2>Extrato</h2>
+
+  @if (carregando()) {
+    <p>Carregando...</p>
+  } @else if (erro(); as mensagem) {
+    <p class="erro">{{ mensagem }}</p>
+  } @else if (transacoes().length === 0) {
+    <p>Nenhuma transacao encontrada.</p>
+  } @else {
+    <ul class="lista">
+      @for (transacao of transacoes(); track transacao.tokenTransacao) {
+        <li class="item">
+          <div class="linha">
+            <strong>{{ transacao.tipoTransacao }}</strong>
+            <span class="valor">R$ {{ transacao.valorTransacao }}</span>
+          </div>
+          <div class="linha detalhes">
+            <span>Conta: {{ contraParte(transacao) }}</span>
+            <span>{{ transacao.statusTransacao }}</span>
+          </div>
+          <div class="linha detalhes">
+            <span>{{ transacao.dataHoraTransacao }}</span>
+          </div>
+          @if (transacao.descricaoTransacao) {
+            <p class="descricao">{{ transacao.descricaoTransacao }}</p>
+          }
+          <p class="token">Token: {{ transacao.tokenTransacao }}</p>
+        </li>
+      }
+    </ul>
+  }
+</section>

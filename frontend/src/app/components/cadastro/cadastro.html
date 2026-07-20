@@ -1,0 +1,55 @@
+<app-layout-auth tituloCartao="Criar conta">
+  @if (contaCriada()) {
+    <div class="sucesso">
+      <h2>Cadastro concluido!</h2>
+      <p class="aviso">Sua conta foi criada. Faca login com seu CPF e senha.</p>
+      <a class="botao-principal" routerLink="/login">Ir para login</a>
+    </div>
+  } @else {
+    <p class="subtitulo-form">Preencha seus dados para abrir sua conta digital.</p>
+
+    <form class="formulario" (submit)="cadastrar(); $event.preventDefault()">
+      <app-campo-formulario
+        rotulo="Nome completo" icone="usuario"
+        placeholder="Digite seu nome completo"
+        [(valor)]="dados.nomeTitular" />
+
+      <app-campo-formulario
+        rotulo="CPF" icone="documento" mascara="cpf"
+        placeholder="Digite seu CPF"
+        [(valor)]="dados.cpf" />
+
+      <app-campo-formulario
+        rotulo="E-mail" icone="email"
+        placeholder="Digite seu e-mail"
+        ajuda="Sera usado tambem como chave PIX."
+        [(valor)]="dados.email" />
+
+      <app-campo-formulario
+        rotulo="Tipo de conta" icone="banco" tipo="select"
+        [opcoes]="tiposConta"
+        [valor]="dados.tipoConta" (valorChange)="dados.tipoConta = $any($event)" />
+
+      <app-campo-formulario
+        rotulo="Senha" icone="cadeado" tipo="senha"
+        placeholder="Digite sua senha"
+        ajuda="Use pelo menos 8 caracteres com letras e numeros."
+        [(valor)]="dados.senha" />
+
+      <button class="botao-principal" type="submit" [disabled]="carregando()">
+        {{ carregando() ? 'Cadastrando...' : 'Cadastrar' }}
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+      </button>
+    </form>
+
+    @if (erro(); as mensagem) {
+      <p class="erro">{{ mensagem }}</p>
+    }
+
+    <div class="ou"><span>ou</span></div>
+
+    <p class="rodape-form">
+      Ja tem conta? <a routerLink="/login">Entrar</a>
+    </p>
+  }
+</app-layout-auth>

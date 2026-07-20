@@ -1,0 +1,32 @@
+$laranja: #f4581e;
+
+.logo-img {
+  height: 48px;
+  width: auto;
+  display: block;
+  margin-left: 8px;
+  object-fit: contain;
+}
+
+.chevron {
+  fill: none;
+  stroke: $laranja;
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.badge {
+  display: inline-grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(15, 31, 51, 0.12);
+}
+
+.badge .chevron {
+  width: 26px;
+  height: 26px;
+}
