@@ -1,50 +1,329 @@
-@if (tipoTransacao(); as tipo) {
-  <form class="formulario" (ngSubmit)="enviar()">
-    <h2>{{ tipo }}</h2>
+@if (tipoTransacao() === 'PIX') {
+  <main class="pix">
+    <header class="hero">
+      <div class="hero__top">
+        <button class="icon-btn" type="button" (click)="voltar()" aria-label="Voltar">
+          <app-icone nome="seta-esquerda" [tamanho]="22" />
+        </button>
+        <img class="hero__logo" src="logo-foursys.png" alt="foursys" />
+        <button class="icon-btn" type="button" aria-label="Ajuda">
+          <app-icone nome="ajuda" [tamanho]="22" />
+        </button>
+      </div>
 
-    @if (exigeOrigem()) {
-      <p class="conta-origem">
-        Origem: <strong>{{ contaAtual()?.nomeTitular }}</strong>
-      </p>
-    }
+      <h1 class="hero__titulo">Pix</h1>
 
-    @if (exigeDestino()) {
-      <app-campo-formulario
-        [rotulo]="tipo === 'PIX' ? 'Chave PIX (CPF ou e-mail)' : 'Numero da conta de destino'"
-        icone="documento"
-        [mascara]="tipo === 'PIX' ? 'chave-pix' : null"
-        [placeholder]="tipo === 'PIX' ? 'Ex: nome@email.com ou CPF' : 'Ex: 00011'"
-        [(valor)]="numeroContaDestino" />
-    }
+      <nav class="abas">
+        <button
+          class="aba"
+          type="button"
+          [class.aba--ativa]="aba() === 'CHAVE'"
+          (click)="selecionarAba('CHAVE')"
+        >
+          Chave Pix
+        </button>
+        <button
+          class="aba"
+          type="button"
+          [class.aba--ativa]="aba() === 'QR'"
+          (click)="selecionarAba('QR')"
+        >
+          QR Code
+        </button>
+        <button
+          class="aba"
+          type="button"
+          [class.aba--ativa]="aba() === 'COPIA'"
+          (click)="selecionarAba('COPIA')"
+        >
+          Copia e cola
+        </button>
+      </nav>
 
-    <app-campo-formulario
-      rotulo="Valor" icone="banco" mascara="moeda"
-      [(valor)]="valorTransacaoTexto" />
+      <app-conta-origem [conta]="contaAtual()" />
+    </header>
 
-    <app-campo-formulario
-      rotulo="Descricao (opcional)" icone="documento"
-      placeholder="Ex: pagamento do almoco"
-      [(valor)]="descricao" />
+    <div class="folha">
+      @if (aba() === 'CHAVE') {
+        <section class="cartao">
+          <h2 class="cartao__titulo">1. Tipo de chave</h2>
+          <div class="segmentos">
+            <button
+              class="segmento"
+              type="button"
+              [class.segmento--ativo]="tipoChave() === 'CPF'"
+              (click)="selecionarTipoChave('CPF')"
+            >
+              <app-icone nome="conta" [tamanho]="20" />
+              CPF/CNPJ
+            </button>
+            <button
+              class="segmento"
+              type="button"
+              [class.segmento--ativo]="tipoChave() === 'EMAIL'"
+              (click)="selecionarTipoChave('EMAIL')"
+            >
+              <app-icone nome="envelope" [tamanho]="20" />
+              E-mail
+            </button>
+            <button
+              class="segmento"
+              type="button"
+              [class.segmento--ativo]="tipoChave() === 'CELULAR'"
+              (click)="selecionarTipoChave('CELULAR')"
+            >
+              <app-icone nome="celular" [tamanho]="20" />
+              Celular
+            </button>
+          </div>
+        </section>
 
-    <button type="submit" [disabled]="carregando()">
-      {{ carregando() ? 'Enviando...' : 'Enviar' }}
-    </button>
-  </form>
+        <form class="form" (ngSubmit)="enviar()">
+          <section class="cartao">
+            <h2 class="cartao__titulo">2. Dados do destinatário</h2>
 
-  @if (resposta(); as transacao) {
-    <div class="resultado sucesso">
-      <h3>Transacao {{ transacao.statusTransacao }}</h3>
-      <p><strong>Token:</strong> {{ transacao.tokenTransacao }}</p>
-      <p><strong>Valor:</strong> {{ transacao.valorTransacao }}</p>
-      <p><strong>Data/hora:</strong> {{ transacao.dataHoraTransacao }}</p>
+            <label class="campo">
+              <span class="campo__rotulo">Chave Pix</span>
+              <span class="campo__entrada">
+                <app-icone class="campo__ic" [nome]="iconeChave()" [tamanho]="20" />
+                <input
+                  [value]="numeroContaDestino"
+                  (input)="aoDigitarChave($event)"
+                  [placeholder]="placeholderChave()"
+                  inputmode="text"
+                />
+                @if (numeroContaDestino) {
+                  <app-icone class="campo__check" nome="check-circle" [tamanho]="20" />
+                }
+              </span>
+            </label>
+
+            <label class="campo">
+              <span class="campo__rotulo">Nome do destinatário</span>
+              <span class="campo__entrada campo__entrada--auto">
+                <app-icone class="campo__ic" nome="usuario" [tamanho]="20" />
+                <input
+                  [value]="nomeDestinatario"
+                  placeholder="Preenchido automaticamente"
+                  disabled
+                />
+                @if (nomeDestinatario) {
+                  <app-icone class="campo__check" nome="check-circle" [tamanho]="20" />
+                }
+              </span>
+            </label>
+          </section>
+
+          <section class="cartao">
+            <h2 class="cartao__titulo">3. Valor</h2>
+
+            <label class="campo">
+              <span class="campo__rotulo">Valor a pagar</span>
+              <span class="campo__entrada campo__entrada--valor">
+                <input
+                  class="campo__valor"
+                  [value]="valorTransacaoTexto"
+                  (input)="aoDigitarValor($event)"
+                  inputmode="numeric"
+                />
+              </span>
+            </label>
+
+            <label class="campo">
+              <span class="campo__rotulo">Descrição (opcional)</span>
+              <span class="campo__entrada">
+                <app-icone class="campo__ic" nome="chat" [tamanho]="20" />
+                <input [(ngModel)]="descricao" name="descricao" placeholder="Ex: pagamento do almoço" />
+                @if (descricao) {
+                  <button class="campo__limpar" type="button" (click)="limparDescricao()" aria-label="Limpar">
+                    <app-icone nome="x" [tamanho]="18" />
+                  </button>
+                }
+              </span>
+            </label>
+          </section>
+
+          <p class="nota">
+            <app-icone class="nota__ic" nome="shield" [tamanho]="20" />
+            Confira os dados antes de confirmar a transferência.
+          </p>
+
+          <div class="acoes">
+            <button class="btn btn--outline" type="button">Revisar</button>
+            <button class="btn btn--primario" type="submit" [disabled]="carregando()">
+              {{ carregando() ? 'Enviando...' : 'Continuar' }}
+            </button>
+          </div>
+
+          @if (resposta(); as transacao) {
+            <div class="resultado resultado--ok">
+              <strong>Transação {{ transacao.statusTransacao }}</strong>
+              <span>Token: {{ transacao.tokenTransacao }}</span>
+            </div>
+          }
+          @if (erro(); as mensagem) {
+            <div class="resultado resultado--erro">{{ mensagem }}</div>
+          }
+        </form>
+      } @else {
+        <section class="cartao">
+          <p class="indisponivel">Disponível em breve.</p>
+        </section>
+      }
     </div>
-  }
 
-  @if (erro(); as mensagem) {
-    <div class="resultado erro">
-      <p>{{ mensagem }}</p>
+    <app-bottom-nav />
+  </main>
+} @else if (tipoTransacao() === 'DEPOSITO') {
+  <main class="pix">
+    <header class="hero">
+      <div class="hero__top">
+        <button class="icon-btn" type="button" (click)="voltar()" aria-label="Voltar">
+          <app-icone nome="seta-esquerda" [tamanho]="22" />
+        </button>
+        <img class="hero__logo" src="logo-foursys.png" alt="foursys" />
+        <button class="icon-btn" type="button" aria-label="Ajuda">
+          <app-icone nome="ajuda" [tamanho]="22" />
+        </button>
+      </div>
+
+      <h1 class="hero__titulo">Depósito</h1>
+
+      <app-conta-origem [conta]="contaAtual()" rotulo="Conta de destino" icone="deposito" />
+    </header>
+
+    <div class="folha">
+      <form class="form" (ngSubmit)="enviar()">
+        <section class="cartao">
+          <h2 class="cartao__titulo">Valor</h2>
+
+          <label class="campo">
+            <span class="campo__rotulo">Valor a depositar</span>
+            <span class="campo__entrada campo__entrada--valor">
+              <input
+                class="campo__valor"
+                [value]="valorTransacaoTexto"
+                (input)="aoDigitarValor($event)"
+                inputmode="numeric"
+              />
+            </span>
+          </label>
+
+          <label class="campo">
+            <span class="campo__rotulo">Descrição (opcional)</span>
+            <span class="campo__entrada">
+              <app-icone class="campo__ic" nome="chat" [tamanho]="20" />
+              <input [(ngModel)]="descricao" name="descricao" placeholder="Ex: depósito em dinheiro" />
+              @if (descricao) {
+                <button class="campo__limpar" type="button" (click)="limparDescricao()" aria-label="Limpar">
+                  <app-icone nome="x" [tamanho]="18" />
+                </button>
+              }
+            </span>
+          </label>
+        </section>
+
+        <p class="nota">
+          <app-icone class="nota__ic" nome="shield" [tamanho]="20" />
+          Confira os dados antes de confirmar o depósito.
+        </p>
+
+        <div class="acoes">
+          <button class="btn btn--outline" type="button">Revisar</button>
+          <button class="btn btn--primario" type="submit" [disabled]="carregando()">
+            {{ carregando() ? 'Enviando...' : 'Continuar' }}
+          </button>
+        </div>
+
+        @if (resposta(); as transacao) {
+          <div class="resultado resultado--ok">
+            <strong>Transação {{ transacao.statusTransacao }}</strong>
+            <span>Token: {{ transacao.tokenTransacao }}</span>
+          </div>
+        }
+        @if (erro(); as mensagem) {
+          <div class="resultado resultado--erro">{{ mensagem }}</div>
+        }
+      </form>
     </div>
-  }
+
+    <app-bottom-nav />
+  </main>
+} @else if (tipoTransacao() === 'SAQUE') {
+  <main class="pix">
+    <header class="hero">
+      <div class="hero__top">
+        <button class="icon-btn" type="button" (click)="voltar()" aria-label="Voltar">
+          <app-icone nome="seta-esquerda" [tamanho]="22" />
+        </button>
+        <img class="hero__logo" src="logo-foursys.png" alt="foursys" />
+        <button class="icon-btn" type="button" aria-label="Ajuda">
+          <app-icone nome="ajuda" [tamanho]="22" />
+        </button>
+      </div>
+
+      <h1 class="hero__titulo">Saque</h1>
+
+      <app-conta-origem [conta]="contaAtual()" rotulo="Conta de origem" />
+    </header>
+
+    <div class="folha">
+      <form class="form" (ngSubmit)="enviar()">
+        <section class="cartao">
+          <h2 class="cartao__titulo">Valor</h2>
+
+          <label class="campo">
+            <span class="campo__rotulo">Valor a sacar</span>
+            <span class="campo__entrada campo__entrada--valor">
+              <input
+                class="campo__valor"
+                [value]="valorTransacaoTexto"
+                (input)="aoDigitarValor($event)"
+                inputmode="numeric"
+              />
+            </span>
+          </label>
+
+          <label class="campo">
+            <span class="campo__rotulo">Descrição (opcional)</span>
+            <span class="campo__entrada">
+              <app-icone class="campo__ic" nome="chat" [tamanho]="20" />
+              <input [(ngModel)]="descricao" name="descricao" placeholder="Ex: saque no caixa" />
+              @if (descricao) {
+                <button class="campo__limpar" type="button" (click)="limparDescricao()" aria-label="Limpar">
+                  <app-icone nome="x" [tamanho]="18" />
+                </button>
+              }
+            </span>
+          </label>
+        </section>
+
+        <p class="nota">
+          <app-icone class="nota__ic" nome="shield" [tamanho]="20" />
+          Confira os dados antes de confirmar o saque.
+        </p>
+
+        <div class="acoes">
+          <button class="btn btn--outline" type="button">Revisar</button>
+          <button class="btn btn--primario" type="submit" [disabled]="carregando()">
+            {{ carregando() ? 'Enviando...' : 'Continuar' }}
+          </button>
+        </div>
+
+        @if (resposta(); as transacao) {
+          <div class="resultado resultado--ok">
+            <strong>Transação {{ transacao.statusTransacao }}</strong>
+            <span>Token: {{ transacao.tokenTransacao }}</span>
+          </div>
+        }
+        @if (erro(); as mensagem) {
+          <div class="resultado resultado--erro">{{ mensagem }}</div>
+        }
+      </form>
+    </div>
+
+    <app-bottom-nav />
+  </main>
 } @else {
   <p class="resultado erro">Tipo de transacao invalido.</p>
 }

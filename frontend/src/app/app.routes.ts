@@ -1,7 +1,6 @@
 import { Routes } from '@angular/router';
 import { Login } from './components/login/login';
 import { Cadastro } from './components/cadastro/cadastro';
-import { Transacoes } from './components/transacoes/transacoes';
 import { FormularioTransacao } from './components/transacoes/formulario/formulario-transacao';
 import { Extrato } from './components/transacoes/extrato/extrato';
 import { Home } from './components/home/home';
@@ -13,13 +12,7 @@ export const routes: Routes = [
   { path: 'cadastro', component: Cadastro },
   { path: 'home', component: Home, canActivate: [loginGuard] },
   { path: 'extrato', component: Extrato, canActivate: [loginGuard] },
-  {
-    path: 'transacoes',
-    component: Transacoes,
-    canActivate: [loginGuard],
-    children: [
-      { path: '', redirectTo: 'pix', pathMatch: 'full' },
-      { path: ':tipo', component: FormularioTransacao }
-    ]
-  }
+  { path: 'pix', component: FormularioTransacao, canActivate: [loginGuard], data: { tipo: 'PIX' } },
+  { path: 'deposito', component: FormularioTransacao, canActivate: [loginGuard], data: { tipo: 'DEPOSITO' } },
+  { path: 'saque', component: FormularioTransacao, canActivate: [loginGuard], data: { tipo: 'SAQUE' } }
 ];

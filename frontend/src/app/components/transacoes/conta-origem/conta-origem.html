@@ -1,0 +1,20 @@
+@if (conta(); as c) {
+  <button class="origem" type="button">
+    <span class="origem__ic">
+      <app-icone [nome]="icone()" [tamanho]="24" />
+    </span>
+
+    <span class="origem__info">
+      <span class="origem__label">{{ rotulo() }}</span>
+      <strong class="origem__conta">
+        {{ rotulosTipo[c.tipoConta] }} • CC {{ c.numeroConta }}
+      </strong>
+      <span class="origem__saldo">
+        Saldo disponível
+        <strong>{{ c.saldoConta | currency: 'BRL' : 'symbol' : '1.2-2' }}</strong>
+      </span>
+    </span>
+
+    <app-icone class="origem__chevron" nome="chevron" [tamanho]="20" />
+  </button>
+}
