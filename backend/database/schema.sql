@@ -25,6 +25,20 @@ CREATE TABLE IF NOT EXISTS conta (
     CONSTRAINT ck_saldo_nao_negativo CHECK (saldo_conta >= 0)
 );
 
+CREATE TABLE IF NOT EXISTS chave_pix (
+    id_chave_pix       BIGINT       NOT NULL AUTO_INCREMENT,
+    id_conta           BIGINT       NOT NULL,
+    tipo_chave         VARCHAR(20)  NOT NULL,
+    valor_normalizado  VARCHAR(120) NOT NULL,
+    ativa              BOOLEAN      NOT NULL DEFAULT TRUE,
+    data_cadastro      DATETIME     NOT NULL,
+    PRIMARY KEY (id_chave_pix),
+    CONSTRAINT uk_chave_pix_tipo_valor UNIQUE (tipo_chave, valor_normalizado),
+    CONSTRAINT uk_chave_pix_conta_tipo UNIQUE (id_conta, tipo_chave),
+    CONSTRAINT fk_chave_pix_conta
+        FOREIGN KEY (id_conta) REFERENCES conta (id_conta) ON DELETE CASCADE
+);
+
 CREATE TABLE IF NOT EXISTS transacao (
     id_transacao          BIGINT        NOT NULL AUTO_INCREMENT,
     token_transacao       VARCHAR(80)   NOT NULL,

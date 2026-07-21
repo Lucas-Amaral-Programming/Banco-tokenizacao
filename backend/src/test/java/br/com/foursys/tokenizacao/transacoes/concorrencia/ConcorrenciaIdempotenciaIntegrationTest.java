@@ -12,7 +12,9 @@ import br.com.foursys.tokenizacao.transacoes.model.TipoConta;
 import br.com.foursys.tokenizacao.transacoes.model.TipoChavePix;
 import br.com.foursys.tokenizacao.transacoes.model.TipoTransacao;
 import br.com.foursys.tokenizacao.transacoes.repository.ContaRepository;
+import br.com.foursys.tokenizacao.transacoes.repository.ChavePixRepository;
 import br.com.foursys.tokenizacao.transacoes.repository.TransacaoRepository;
+import br.com.foursys.tokenizacao.transacoes.service.ChavePixService;
 import br.com.foursys.tokenizacao.transacoes.service.ResultadoTransacao;
 import br.com.foursys.tokenizacao.transacoes.service.TransacaoService;
 import java.math.BigDecimal;
@@ -34,14 +36,20 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 class ConcorrenciaIdempotenciaIntegrationTest extends AbstractMySqlTestcontainers {
 
-    private static final String CPF_A = "11111111111";
-    private static final String CPF_B = "22222222222";
+    private static final String CPF_A = "52998224725";
+    private static final String CPF_B = "12345678909";
 
     @Autowired
     private TransacaoService transacaoService;
 
     @Autowired
     private ContaRepository contaRepository;
+
+    @Autowired
+    private ChavePixRepository chavePixRepository;
+
+    @Autowired
+    private ChavePixService chavePixService;
 
     @Autowired
     private TransacaoRepository transacaoRepository;
@@ -52,6 +60,7 @@ class ConcorrenciaIdempotenciaIntegrationTest extends AbstractMySqlTestcontainer
     @BeforeEach
     void preparar() {
         transacaoRepository.deleteAll();
+        chavePixRepository.deleteAll();
         contaRepository.deleteAll();
     }
 
@@ -233,7 +242,7 @@ class ConcorrenciaIdempotenciaIntegrationTest extends AbstractMySqlTestcontainer
     }
 
     private void criarConta(String numero, String cpf, String email, BigDecimal saldo, StatusConta status) {
-        contaRepository.save(Conta.builder()
+        Conta conta = contaRepository.save(Conta.builder()
                 .numeroConta(numero)
                 .nomeTitular("Titular " + numero)
                 .cpf(cpf)
@@ -245,5 +254,6 @@ class ConcorrenciaIdempotenciaIntegrationTest extends AbstractMySqlTestcontainer
                 .senhaConta(passwordEncoder.encode("123456"))
                 .dataAbertura(LocalDateTime.now())
                 .build());
+        chavePixService.registrarChavesIniciais(conta);
     }
 }

@@ -167,6 +167,25 @@
   gap: var(--space-3);
 }
 
+.segmentos--escolha {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.escolha-chave {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.mensagem-chave {
+  margin: 0;
+  font-size: var(--fs-label);
+}
+
+.mensagem-chave--erro {
+  color: var(--color-danger);
+}
+
 .segmento {
   display: inline-flex;
   align-items: center;

@@ -8,11 +8,14 @@ import { ContaService } from '../../../services/conta.service';
 import { Icone, NomeIcone } from '../../shared/icone/icone';
 import { BottomNav } from '../../home/bottom-nav/bottom-nav';
 import { ContaOrigem } from '../conta-origem/conta-origem';
+import { cpfEhValido } from '../../../utils/cpf';
+import { emailEhValido } from '../../../utils/email';
+import { telefoneEhValido } from '../../../utils/telefone';
 
 const TIPOS_VALIDOS: TipoTransacao[] = ['PIX', 'DEPOSITO', 'SAQUE'];
 
-type TipoChave = 'CPF' | 'EMAIL' | 'CELULAR';
 type AbaPix = 'CHAVE' | 'QR' | 'COPIA';
+type EstadoChavePix = 'INDEFINIDA' | TipoChavePix | 'AMBIGUA' | 'INVALIDA';
 
 @Component({
   selector: 'app-formulario-transacao',
@@ -48,31 +51,41 @@ export class FormularioTransacao {
 
   // ----- Estado especifico da tela PIX -----
   protected readonly aba = signal<AbaPix>('CHAVE');
-  protected readonly tipoChave = signal<TipoChave>('CELULAR');
-
-  // Mock: sem endpoint de consulta de chave, o nome eh resolvido localmente ao
-  // completar a chave (banco/instituicao viria junto e esta oculto por enquanto).
+  protected readonly estadoChave = signal<EstadoChavePix>('INDEFINIDA');
+  protected readonly consultandoDestinatario = signal(false);
+  protected readonly destinatarioResolvido = signal(false);
+  protected readonly erroChave = signal<string | null>(null);
   protected nomeDestinatario = '';
+  private versaoConsultaDestinatario = 0;
+
+  protected readonly tipoChave = computed<TipoChavePix | null>(() => {
+    const estado = this.estadoChave();
+    return estado === 'CPF' || estado === 'EMAIL' || estado === 'CELULAR' ? estado : null;
+  });
 
   protected readonly iconeChave = computed<NomeIcone>(() => {
-    switch (this.tipoChave()) {
+    switch (this.estadoChave()) {
       case 'CPF':
         return 'conta';
       case 'EMAIL':
         return 'envelope';
-      default:
+      case 'CELULAR':
         return 'telefone';
+      default:
+        return 'pix';
     }
   });
 
   protected readonly placeholderChave = computed(() => {
-    switch (this.tipoChave()) {
+    switch (this.estadoChave()) {
       case 'CPF':
         return '000.000.000-00';
       case 'EMAIL':
         return 'nome@email.com';
-      default:
+      case 'CELULAR':
         return '(11) 99999-1234';
+      default:
+        return 'CPF, e-mail ou celular';
     }
   });
 
@@ -113,41 +126,108 @@ export class FormularioTransacao {
     this.aba.set(aba);
   }
 
-  selecionarTipoChave(tipo: TipoChave): void {
-    this.tipoChave.set(tipo);
-    this.numeroContaDestino = '';
-    this.chaveExibida = '';
-    this.resolverDestinatario();
+  selecionarTipoChave(tipo: 'CPF' | 'CELULAR'): void {
+    if (this.estadoChave() !== 'AMBIGUA') {
+      return;
+    }
+    this.estadoChave.set(tipo);
+    this.chaveExibida = tipo === 'CPF'
+      ? this.mascaraCpf(this.numeroContaDestino)
+      : this.mascaraTelefone(this.numeroContaDestino);
+    this.resolverDestinatario(tipo);
   }
 
   aoDigitarChave(evento: Event): void {
     const alvo = evento.target as HTMLInputElement;
-    const digitado = alvo.value;
+    const digitado = alvo.value.slice(0, 120);
+    this.invalidarDestinatario();
 
-    if (this.tipoChave() === 'EMAIL') {
+    if (/[A-Za-z@]/.test(digitado)) {
+      this.estadoChave.set('EMAIL');
       this.chaveExibida = digitado;
-      this.numeroContaDestino = digitado.trim();
+      this.numeroContaDestino = digitado.trim().toLowerCase();
+      if (emailEhValido(this.numeroContaDestino)) {
+        this.resolverDestinatario('EMAIL');
+      }
     } else {
-      const cru = digitado.replace(/\D/g, '').slice(0, 11);
-      this.numeroContaDestino = cru;
-      this.chaveExibida =
-        this.tipoChave() === 'CPF' ? this.mascaraCpf(cru) : this.mascaraTelefone(cru);
+      const digitos = digitado.replace(/\D/g, '').slice(0, 11);
+      this.numeroContaDestino = digitos;
+      this.classificarChaveNumerica(digitos);
     }
-
     alvo.value = this.chaveExibida;
-    this.resolverDestinatario();
   }
 
-  private resolverDestinatario(): void {
-    // Mock: quando a chave estiver completa, o nome seria retornado pela consulta.
-    this.nomeDestinatario = this.chaveCompleta() ? 'Ana Souza' : '';
-  }
-
-  private chaveCompleta(): boolean {
-    if (this.tipoChave() === 'EMAIL') {
-      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.numeroContaDestino);
+  private classificarChaveNumerica(digitos: string): void {
+    if (digitos.length < 11) {
+      this.estadoChave.set('INDEFINIDA');
+      this.chaveExibida = digitos;
+      return;
     }
-    return this.numeroContaDestino.length === 11;
+
+    const ehCpf = cpfEhValido(digitos);
+    const ehCelular = telefoneEhValido(digitos);
+    if (ehCpf && ehCelular) {
+      this.estadoChave.set('AMBIGUA');
+      this.chaveExibida = digitos;
+    } else if (ehCpf) {
+      this.estadoChave.set('CPF');
+      this.chaveExibida = this.mascaraCpf(digitos);
+      this.resolverDestinatario('CPF');
+    } else if (ehCelular) {
+      this.estadoChave.set('CELULAR');
+      this.chaveExibida = this.mascaraTelefone(digitos);
+      this.resolverDestinatario('CELULAR');
+    } else {
+      this.estadoChave.set('INVALIDA');
+      this.chaveExibida = digitos;
+      this.erroChave.set('Chave PIX invalida.');
+    }
+  }
+
+  private resolverDestinatario(tipo: TipoChavePix): void {
+    const versao = ++this.versaoConsultaDestinatario;
+    this.consultandoDestinatario.set(true);
+    this.erroChave.set(null);
+    this.transacaoService.resolverChavePix({
+      tipoChavePix: tipo,
+      chave: this.numeroContaDestino
+    }).subscribe({
+      next: (destinatario) => {
+        if (versao !== this.versaoConsultaDestinatario) {
+          return;
+        }
+        this.nomeDestinatario = destinatario.nomeTitular;
+        this.destinatarioResolvido.set(true);
+        this.consultandoDestinatario.set(false);
+      },
+      error: (falha) => {
+        if (versao !== this.versaoConsultaDestinatario) {
+          return;
+        }
+        this.nomeDestinatario = '';
+        this.destinatarioResolvido.set(false);
+        this.consultandoDestinatario.set(false);
+        this.erroChave.set(falha?.error?.mensagem ?? 'Chave PIX nao encontrada.');
+      }
+    });
+  }
+
+  private invalidarDestinatario(): void {
+    this.versaoConsultaDestinatario++;
+    this.nomeDestinatario = '';
+    this.destinatarioResolvido.set(false);
+    this.consultandoDestinatario.set(false);
+    this.erroChave.set(null);
+  }
+
+  protected podeEnviar(): boolean {
+    if (this.carregando() || this.paraNumero(this.valorTransacaoTexto) <= 0) {
+      return false;
+    }
+    return this.tipoTransacao() !== 'PIX'
+      || (this.tipoChave() !== null
+        && this.destinatarioResolvido()
+        && !this.consultandoDestinatario());
   }
 
   aoDigitarValor(evento: Event): void {
@@ -162,7 +242,8 @@ export class FormularioTransacao {
   }
 
   enviar(): void {
-    if (this.carregando()) {
+    if (!this.podeEnviar()) {
+      this.erro.set('Preencha os dados obrigatorios antes de continuar.');
       return;
     }
 
@@ -237,9 +318,10 @@ export class FormularioTransacao {
   private limparCampos(): void {
     this.numeroContaDestino = '';
     this.chaveExibida = '';
+    this.estadoChave.set('INDEFINIDA');
     this.valorTransacaoTexto = 'R$ 0,00';
     this.descricao = '';
-    this.nomeDestinatario = '';
+    this.invalidarDestinatario();
   }
 
   private paraNumero(valorFormatado: string): number {

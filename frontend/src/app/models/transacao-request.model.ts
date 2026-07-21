@@ -1,6 +1,16 @@
 export type TipoTransacao = 'PIX' | 'DEPOSITO' | 'SAQUE';
 
-export type TipoChavePix = 'CPF' | 'EMAIL' | 'CELULAR' | 'COPIA_COLA';
+export type TipoChavePix = 'CPF' | 'EMAIL' | 'CELULAR';
+
+export interface ResolverChavePixRequest {
+  tipoChavePix: TipoChavePix;
+  chave: string;
+}
+
+export interface DestinatarioPixResponse {
+  nomeTitular: string;
+  tipoChavePix: TipoChavePix;
+}
 
 export interface TransacaoRequest {
   tipoTransacao: TipoTransacao;

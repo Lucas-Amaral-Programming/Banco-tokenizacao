@@ -45,42 +45,9 @@
 
     <div class="folha">
       @if (aba() === 'CHAVE') {
-        <section class="cartao">
-          <h2 class="cartao__titulo">1. Tipo de chave</h2>
-          <div class="segmentos">
-            <button
-              class="segmento"
-              type="button"
-              [class.segmento--ativo]="tipoChave() === 'CPF'"
-              (click)="selecionarTipoChave('CPF')"
-            >
-              <app-icone nome="conta" [tamanho]="20" />
-              CPF/CNPJ
-            </button>
-            <button
-              class="segmento"
-              type="button"
-              [class.segmento--ativo]="tipoChave() === 'EMAIL'"
-              (click)="selecionarTipoChave('EMAIL')"
-            >
-              <app-icone nome="envelope" [tamanho]="20" />
-              E-mail
-            </button>
-            <button
-              class="segmento"
-              type="button"
-              [class.segmento--ativo]="tipoChave() === 'CELULAR'"
-              (click)="selecionarTipoChave('CELULAR')"
-            >
-              <app-icone nome="celular" [tamanho]="20" />
-              Celular
-            </button>
-          </div>
-        </section>
-
         <form class="form" (ngSubmit)="enviar()">
           <section class="cartao">
-            <h2 class="cartao__titulo">2. Dados do destinatário</h2>
+            <h2 class="cartao__titulo">1. Dados do destinatário</h2>
 
             <label class="campo">
               <span class="campo__rotulo">Chave Pix</span>
@@ -92,11 +59,29 @@
                   [placeholder]="placeholderChave()"
                   inputmode="text"
                 />
-                @if (chaveExibida) {
+                @if (destinatarioResolvido()) {
                   <app-icone class="campo__check" nome="check-circle" [tamanho]="20" />
                 }
               </span>
             </label>
+
+            @if (estadoChave() === 'AMBIGUA') {
+              <div class="escolha-chave" aria-live="polite">
+                <span class="campo__rotulo">Essa chave pode ser CPF ou celular. Qual é?</span>
+                <div class="segmentos segmentos--escolha">
+                  <button class="segmento" type="button" (click)="selecionarTipoChave('CPF')">
+                    <app-icone nome="conta" [tamanho]="20" /> CPF
+                  </button>
+                  <button class="segmento" type="button" (click)="selecionarTipoChave('CELULAR')">
+                    <app-icone nome="celular" [tamanho]="20" /> Celular
+                  </button>
+                </div>
+              </div>
+            }
+
+            @if (erroChave(); as mensagem) {
+              <p class="mensagem-chave mensagem-chave--erro" aria-live="polite">{{ mensagem }}</p>
+            }
 
             <label class="campo">
               <span class="campo__rotulo">Nome do destinatário</span>
@@ -104,7 +89,7 @@
                 <app-icone class="campo__ic" nome="usuario" [tamanho]="20" />
                 <input
                   [value]="nomeDestinatario"
-                  placeholder="Preenchido automaticamente"
+                  [placeholder]="consultandoDestinatario() ? 'Consultando...' : 'Preenchido automaticamente'"
                   disabled
                 />
                 @if (nomeDestinatario) {
@@ -115,7 +100,7 @@
           </section>
 
           <section class="cartao">
-            <h2 class="cartao__titulo">3. Valor</h2>
+            <h2 class="cartao__titulo">2. Valor</h2>
 
             <label class="campo">
               <span class="campo__rotulo">Valor a pagar</span>
@@ -150,7 +135,7 @@
 
           <div class="acoes">
             <button class="btn btn--outline" type="button">Revisar</button>
-            <button class="btn btn--primario" type="submit" [disabled]="carregando()">
+            <button class="btn btn--primario" type="submit" [disabled]="!podeEnviar()">
               {{ carregando() ? 'Enviando...' : 'Continuar' }}
             </button>
           </div>
@@ -230,7 +215,7 @@
 
         <div class="acoes">
           <button class="btn btn--outline" type="button">Revisar</button>
-          <button class="btn btn--primario" type="submit" [disabled]="carregando()">
+          <button class="btn btn--primario" type="submit" [disabled]="!podeEnviar()">
             {{ carregando() ? 'Enviando...' : 'Continuar' }}
           </button>
         </div>
@@ -305,7 +290,7 @@
 
         <div class="acoes">
           <button class="btn btn--outline" type="button">Revisar</button>
-          <button class="btn btn--primario" type="submit" [disabled]="carregando()">
+          <button class="btn btn--primario" type="submit" [disabled]="!podeEnviar()">
             {{ carregando() ? 'Enviando...' : 'Continuar' }}
           </button>
         </div>

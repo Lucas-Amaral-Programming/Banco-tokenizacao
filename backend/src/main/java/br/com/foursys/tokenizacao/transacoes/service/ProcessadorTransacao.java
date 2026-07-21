@@ -2,7 +2,6 @@ package br.com.foursys.tokenizacao.transacoes.service;
 
 import br.com.foursys.tokenizacao.transacoes.dto.request.TransacaoRequest;
 import br.com.foursys.tokenizacao.transacoes.dto.response.TransacaoResponse;
-import br.com.foursys.tokenizacao.transacoes.exception.ChavePixNaoEncontradaException;
 import br.com.foursys.tokenizacao.transacoes.exception.ContaDestinoObrigatoriaException;
 import br.com.foursys.tokenizacao.transacoes.exception.ContaInativaException;
 import br.com.foursys.tokenizacao.transacoes.exception.ContaNaoEncontradaException;
@@ -38,13 +37,16 @@ public class ProcessadorTransacao {
     private final ContaRepository contaRepository;
     private final TransacaoRepository transacaoRepository;
     private final TokenTransacaoService tokenTransacaoService;
+    private final ChavePixService chavePixService;
 
     public ProcessadorTransacao(ContaRepository contaRepository,
                                 TransacaoRepository transacaoRepository,
-                                TokenTransacaoService tokenTransacaoService) {
+                                TokenTransacaoService tokenTransacaoService,
+                                ChavePixService chavePixService) {
         this.contaRepository = contaRepository;
         this.transacaoRepository = transacaoRepository;
         this.tokenTransacaoService = tokenTransacaoService;
+        this.chavePixService = chavePixService;
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -150,19 +152,8 @@ public class ProcessadorTransacao {
             throw new ContaDestinoObrigatoriaException(request.tipoTransacao());
         }
         return request.tipoTransacao() == TipoTransacao.PIX
-                ? buscarContaPorChavePix(request.numeroContaDestino())
+                ? chavePixService.resolver(request.tipoChavePix(), request.numeroContaDestino())
                 : buscarConta(request.numeroContaDestino());
-    }
-
-    private Conta buscarContaPorChavePix(String chave) {
-        String chaveTratada = chave.trim();
-        if (chaveTratada.contains("@")) {
-            return contaRepository.findByEmail(chaveTratada)
-                    .orElseThrow(() -> new ChavePixNaoEncontradaException(chaveTratada));
-        }
-        String cpfTratado = chaveTratada.replaceAll("\\D", "");
-        return contaRepository.findByCpf(cpfTratado)
-                .orElseThrow(() -> new ChavePixNaoEncontradaException(chaveTratada));
     }
 
     private void validarContasDiferentes(Conta contaOrigem, Conta contaDestino) {

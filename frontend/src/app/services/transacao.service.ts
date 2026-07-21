@@ -1,7 +1,11 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
-import { TransacaoRequest } from '../models/transacao-request.model';
+import {
+  DestinatarioPixResponse,
+  ResolverChavePixRequest,
+  TransacaoRequest
+} from '../models/transacao-request.model';
 import { TransacaoResponse } from '../models/transacao-response.model';
 
 @Injectable({ providedIn: 'root' })
@@ -17,5 +21,9 @@ export class TransacaoService {
 
   listarExtrato(): Observable<TransacaoResponse[]> {
     return this.http.get<TransacaoResponse[]>(this.urlBase);
+  }
+
+  resolverChavePix(request: ResolverChavePixRequest): Observable<DestinatarioPixResponse> {
+    return this.http.post<DestinatarioPixResponse>('/api/chaves-pix/resolver', request);
   }
 }

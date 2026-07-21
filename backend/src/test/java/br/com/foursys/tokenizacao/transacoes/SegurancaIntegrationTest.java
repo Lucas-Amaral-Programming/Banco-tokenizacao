@@ -16,7 +16,9 @@ import br.com.foursys.tokenizacao.transacoes.model.TipoChavePix;
 import br.com.foursys.tokenizacao.transacoes.model.TipoConta;
 import br.com.foursys.tokenizacao.transacoes.model.TipoTransacao;
 import br.com.foursys.tokenizacao.transacoes.repository.ContaRepository;
+import br.com.foursys.tokenizacao.transacoes.repository.ChavePixRepository;
 import br.com.foursys.tokenizacao.transacoes.repository.TransacaoRepository;
+import br.com.foursys.tokenizacao.transacoes.service.ChavePixService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.math.BigDecimal;
@@ -39,9 +41,9 @@ import org.springframework.mock.web.MockHttpSession;
 @ActiveProfiles("test")
 class SegurancaIntegrationTest {
 
-    private static final String CPF_MARIA = "11111111111";
-    private static final String CPF_JOAO = "22222222222";
-    private static final String CPF_CARLOS = "33333333333";
+    private static final String CPF_MARIA = "52998224725";
+    private static final String CPF_JOAO = "12345678909";
+    private static final String CPF_CARLOS = "11144477735";
     private static final String SENHA = "123456";
 
     @Autowired
@@ -49,6 +51,12 @@ class SegurancaIntegrationTest {
 
     @Autowired
     private ContaRepository contaRepository;
+
+    @Autowired
+    private ChavePixRepository chavePixRepository;
+
+    @Autowired
+    private ChavePixService chavePixService;
 
     @Autowired
     private TransacaoRepository transacaoRepository;
@@ -62,6 +70,7 @@ class SegurancaIntegrationTest {
     @BeforeEach
     void preparar() {
         transacaoRepository.deleteAll();
+        chavePixRepository.deleteAll();
         contaRepository.deleteAll();
         criarConta("00011", CPF_MARIA, "maria@teste.com", StatusConta.ATIVA);
         criarConta("00022", CPF_JOAO, "joao@teste.com", StatusConta.ATIVA);
@@ -114,6 +123,32 @@ class SegurancaIntegrationTest {
     }
 
     @Test
+    void resolverChavePixExigeSessaoECsrf() throws Exception {
+        mvc.perform(post("/api/chaves-pix/resolver")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"tipoChavePix\":\"CPF\",\"chave\":\"" + CPF_JOAO + "\"}"))
+                .andExpect(status().isUnauthorized());
+
+        MockHttpSession sessao = login(CPF_MARIA, SENHA);
+        mvc.perform(post("/api/chaves-pix/resolver")
+                        .session(sessao)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"tipoChavePix\":\"CPF\",\"chave\":\"" + CPF_JOAO + "\"}"))
+                .andExpect(status().isForbidden());
+
+        mvc.perform(post("/api/chaves-pix/resolver")
+                        .session(sessao)
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"tipoChavePix\":\"CPF\",\"chave\":\"" + CPF_JOAO + "\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.nomeTitular").value("Titular 00022"))
+                .andExpect(jsonPath("$.tipoChavePix").value("CPF"))
+                .andExpect(jsonPath("$.numeroConta").doesNotExist());
+    }
+
+    @Test
     void usuarioNaoAcessaExtratoDeOutraConta() throws Exception {
         MockHttpSession sessaoMaria = login(CPF_MARIA, SENHA);
         mvc.perform(post("/api/transacoes").session(sessaoMaria).with(csrf())
@@ -122,7 +157,7 @@ class SegurancaIntegrationTest {
                         .content(transacaoJson(TipoTransacao.PIX, CPF_JOAO, "100.00")))
                 .andExpect(status().isCreated());
 
-        String cpfTerceiro = "52998224725";
+        String cpfTerceiro = "16899535009";
         cadastrar("Novo Cliente", cpfTerceiro, "11977770001", "novo@teste.com");
         MockHttpSession sessaoTerceiro = login(cpfTerceiro, SENHA);
 
@@ -156,7 +191,7 @@ class SegurancaIntegrationTest {
 
     @Test
     void fluxoCompletoCadastroLoginTransacaoExtratoLogout() throws Exception {
-        String cpf = "52998224725";
+        String cpf = "39053344705";
         String numeroConta = cadastrar("Cliente E2E", cpf, "11977770002", "e2e@teste.com");
 
         MockHttpSession sessao = login(cpf, SENHA);
@@ -210,7 +245,7 @@ class SegurancaIntegrationTest {
     }
 
     private Conta criarConta(String numero, String cpf, String email, StatusConta status) {
-        return contaRepository.save(Conta.builder()
+        Conta conta = contaRepository.save(Conta.builder()
                 .numeroConta(numero)
                 .nomeTitular("Titular " + numero)
                 .cpf(cpf)
@@ -222,5 +257,7 @@ class SegurancaIntegrationTest {
                 .senhaConta(passwordEncoder.encode(SENHA))
                 .dataAbertura(LocalDateTime.now())
                 .build());
+        chavePixService.registrarChavesIniciais(conta);
+        return conta;
     }
 }

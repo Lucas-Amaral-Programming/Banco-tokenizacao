@@ -15,7 +15,9 @@ import br.com.foursys.tokenizacao.transacoes.model.TipoChavePix;
 import br.com.foursys.tokenizacao.transacoes.model.TipoTransacao;
 import br.com.foursys.tokenizacao.transacoes.model.Transacao;
 import br.com.foursys.tokenizacao.transacoes.repository.ContaRepository;
+import br.com.foursys.tokenizacao.transacoes.repository.ChavePixRepository;
 import br.com.foursys.tokenizacao.transacoes.repository.TransacaoRepository;
+import br.com.foursys.tokenizacao.transacoes.service.ChavePixService;
 import br.com.foursys.tokenizacao.transacoes.service.TransacaoService;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -36,6 +38,12 @@ class RollbackTransacaoIntegrationTest extends AbstractMySqlTestcontainers {
     private ContaRepository contaRepository;
 
     @Autowired
+    private ChavePixRepository chavePixRepository;
+
+    @Autowired
+    private ChavePixService chavePixService;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @MockitoBean
@@ -43,6 +51,7 @@ class RollbackTransacaoIntegrationTest extends AbstractMySqlTestcontainers {
 
     @BeforeEach
     void preparar() {
+        chavePixRepository.deleteAll();
         contaRepository.deleteAll();
         when(transacaoRepository.findByContaSolicitante_IdContaAndIdempotencyKey(anyLong(), anyString()))
                 .thenReturn(Optional.empty());
@@ -53,11 +62,11 @@ class RollbackTransacaoIntegrationTest extends AbstractMySqlTestcontainers {
 
     @Test
     void falhaAoSalvarTransacaoReverteTodosOsSaldos() {
-        criarConta("00011", "11111111111", "a@teste.com", new BigDecimal("1000.00"));
-        criarConta("00022", "22222222222", "b@teste.com", new BigDecimal("1000.00"));
+        criarConta("00011", "52998224725", "a@teste.com", new BigDecimal("1000.00"));
+        criarConta("00022", "12345678909", "b@teste.com", new BigDecimal("1000.00"));
 
         assertThatThrownBy(() -> transacaoService.processar(
-                new TransacaoRequest(TipoTransacao.PIX, "22222222222", TipoChavePix.CPF, new BigDecimal("100.00"), "pix"),
+                new TransacaoRequest(TipoTransacao.PIX, "12345678909", TipoChavePix.CPF, new BigDecimal("100.00"), "pix"),
                 "00011",
                 UUID.randomUUID().toString()))
                 .isInstanceOf(RuntimeException.class);
@@ -71,7 +80,7 @@ class RollbackTransacaoIntegrationTest extends AbstractMySqlTestcontainers {
     }
 
     private void criarConta(String numero, String cpf, String email, BigDecimal saldo) {
-        contaRepository.save(Conta.builder()
+        Conta conta = contaRepository.save(Conta.builder()
                 .numeroConta(numero)
                 .nomeTitular("Titular " + numero)
                 .cpf(cpf)
@@ -83,5 +92,6 @@ class RollbackTransacaoIntegrationTest extends AbstractMySqlTestcontainers {
                 .senhaConta(passwordEncoder.encode("123456"))
                 .dataAbertura(LocalDateTime.now())
                 .build());
+        chavePixService.registrarChavesIniciais(conta);
     }
 }
