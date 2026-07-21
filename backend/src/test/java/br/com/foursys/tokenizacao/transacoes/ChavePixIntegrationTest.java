@@ -2,9 +2,11 @@ package br.com.foursys.tokenizacao.transacoes;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.tuple;
 
 import br.com.foursys.tokenizacao.transacoes.dto.request.CadastroContaRequest;
 import br.com.foursys.tokenizacao.transacoes.dto.request.TransacaoRequest;
+import br.com.foursys.tokenizacao.transacoes.dto.response.ChavePixResponse;
 import br.com.foursys.tokenizacao.transacoes.exception.ChavePixInvalidaException;
 import br.com.foursys.tokenizacao.transacoes.exception.ChavePixNaoEncontradaException;
 import br.com.foursys.tokenizacao.transacoes.exception.NomeIncompletoException;
@@ -177,6 +179,33 @@ class ChavePixIntegrationTest {
                 .isInstanceOf(DataIntegrityViolationException.class);
 
         assertThat(contaRepository.findByCpf("11144477735")).isEmpty();
+    }
+
+    @Test
+    void listarPorContaRetornaAsChavesAtivasDaContaLogada() {
+        criarConta("00011", "52998224725", "11987654321", "a@teste.com", true);
+        criarConta("00022", "12345678909", "21987654321", "b@teste.com", true);
+
+        assertThat(chavePixService.listarPorConta("00011"))
+                .extracting(ChavePixResponse::tipoChavePix, ChavePixResponse::chave)
+                .containsExactlyInAnyOrder(
+                        tuple(TipoChavePix.CPF, "52998224725"),
+                        tuple(TipoChavePix.EMAIL, "a@teste.com"),
+                        tuple(TipoChavePix.CELULAR, "11987654321"));
+    }
+
+    @Test
+    void listarPorContaIgnoraChavesInativas() {
+        Conta conta = criarConta("00011", "52998224725", "11987654321", "a@teste.com", false);
+        chavePixRepository.save(ChavePix.builder()
+                .conta(conta)
+                .tipoChave(TipoChavePix.CPF)
+                .valorNormalizado("52998224725")
+                .ativa(false)
+                .dataCadastro(LocalDateTime.now())
+                .build());
+
+        assertThat(chavePixService.listarPorConta("00011")).isEmpty();
     }
 
     private Conta criarConta(String numero,

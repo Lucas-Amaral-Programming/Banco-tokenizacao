@@ -1,0 +1,29 @@
+<app-layout-banco>
+  <header class="hero" layout-cabecalho>
+    <div class="hero__top">
+      <button class="icon-btn" type="button" (click)="voltar()" aria-label="Voltar">
+        <app-icone nome="seta-esquerda" [tamanho]="22" />
+      </button>
+      <img class="hero__logo" src="logo-foursys.png" alt="foursys" />
+      <span class="icon-btn" aria-hidden="true"></span>
+    </div>
+
+    <h1 class="hero__titulo">Extrato Pix</h1>
+  </header>
+
+  <section class="lista" layout-conteudo>
+    @if (carregando()) {
+      <p class="aviso">Carregando...</p>
+    } @else if (erro(); as mensagem) {
+      <p class="aviso aviso--erro">{{ mensagem }}</p>
+    } @else if (transacoes().length === 0) {
+      <p class="aviso">Nenhuma transação Pix encontrada.</p>
+    } @else {
+      @for (transacao of transacoes(); track transacao.tokenTransacao) {
+        <app-transacao-item [transacao]="transacao" [numeroContaAtual]="numeroContaAtual()" />
+      }
+    }
+  </section>
+
+  <app-bottom-nav layout-navegacao />
+</app-layout-banco>

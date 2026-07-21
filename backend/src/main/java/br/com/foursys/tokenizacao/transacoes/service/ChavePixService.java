@@ -1,5 +1,6 @@
 package br.com.foursys.tokenizacao.transacoes.service;
 
+import br.com.foursys.tokenizacao.transacoes.dto.response.ChavePixResponse;
 import br.com.foursys.tokenizacao.transacoes.exception.ChavePixInvalidaException;
 import br.com.foursys.tokenizacao.transacoes.exception.ChavePixNaoEncontradaException;
 import br.com.foursys.tokenizacao.transacoes.exception.TipoChavePixObrigatorioException;
@@ -30,6 +31,13 @@ public class ChavePixService {
                 nova(conta, TipoChavePix.CPF, normalizar(TipoChavePix.CPF, conta.getCpf()), agora),
                 nova(conta, TipoChavePix.EMAIL, normalizar(TipoChavePix.EMAIL, conta.getEmail()), agora),
                 nova(conta, TipoChavePix.CELULAR, normalizar(TipoChavePix.CELULAR, conta.getTelefone()), agora)));
+    }
+
+    public List<ChavePixResponse> listarPorConta(String numeroConta) {
+        return chavePixRepository.findByContaNumeroContaAndAtivaTrueOrderByTipoChaveAsc(numeroConta)
+                .stream()
+                .map(chave -> new ChavePixResponse(chave.getTipoChave(), chave.getValorNormalizado()))
+                .toList();
     }
 
     public Conta resolver(TipoChavePix tipo, String chave) {

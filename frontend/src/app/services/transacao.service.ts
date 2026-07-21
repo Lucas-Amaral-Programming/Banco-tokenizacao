@@ -7,6 +7,7 @@ import {
   TransacaoRequest
 } from '../models/transacao-request.model';
 import { TransacaoResponse } from '../models/transacao-response.model';
+import { ChavePixResponse } from '../models/chave-pix.model';
 
 @Injectable({ providedIn: 'root' })
 export class TransacaoService {
@@ -25,5 +26,9 @@ export class TransacaoService {
 
   resolverChavePix(request: ResolverChavePixRequest): Observable<DestinatarioPixResponse> {
     return this.http.post<DestinatarioPixResponse>('/api/chaves-pix/resolver', request);
+  }
+
+  listarMinhasChaves(): Observable<ChavePixResponse[]> {
+    return this.http.get<ChavePixResponse[]>('/api/chaves-pix');
   }
 }

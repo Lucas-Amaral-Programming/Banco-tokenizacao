@@ -1,6 +1,15 @@
-import { Component, computed, inject, input, signal } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  computed,
+  inject,
+  input,
+  signal,
+  viewChild
+} from '@angular/core';
 import { Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { TipoChavePix, TipoTransacao, TransacaoRequest } from '../../../models/transacao-request.model';
 import { TransacaoResponse } from '../../../models/transacao-response.model';
 import { TransacaoService } from '../../../services/transacao.service';
@@ -15,12 +24,11 @@ import { telefoneEhValido } from '../../../utils/telefone';
 
 const TIPOS_VALIDOS: TipoTransacao[] = ['PIX', 'DEPOSITO', 'SAQUE'];
 
-type AbaPix = 'CHAVE' | 'QR' | 'COPIA';
 type EstadoChavePix = 'INDEFINIDA' | TipoChavePix | 'AMBIGUA' | 'INVALIDA';
 
 @Component({
   selector: 'app-formulario-transacao',
-  imports: [FormsModule, Icone, BottomNav, ContaOrigem, LayoutBanco],
+  imports: [FormsModule, RouterLink, Icone, BottomNav, ContaOrigem, LayoutBanco],
   templateUrl: './formulario-transacao.html',
   styleUrl: './formulario-transacao.scss'
 })
@@ -51,7 +59,10 @@ export class FormularioTransacao {
   });
 
   // ----- Estado especifico da tela PIX -----
-  protected readonly aba = signal<AbaPix>('CHAVE');
+  protected readonly etapa = signal<'CHAVE' | 'VALOR'>('CHAVE');
+  protected readonly aviso = signal<string | null>(null);
+  private readonly botaoContinuar = viewChild<ElementRef<HTMLButtonElement>>('botaoContinuar');
+  private readonly inputChave = viewChild<ElementRef<HTMLInputElement>>('inputChave');
   protected readonly estadoChave = signal<EstadoChavePix>('INDEFINIDA');
   protected readonly consultandoDestinatario = signal(false);
   protected readonly destinatarioResolvido = signal(false);
@@ -123,8 +134,29 @@ export class FormularioTransacao {
     this.location.back();
   }
 
-  selecionarAba(aba: AbaPix): void {
-    this.aba.set(aba);
+  avancarParaValor(): void {
+    if (this.destinatarioResolvido()) {
+      this.etapa.set('VALOR');
+    }
+  }
+
+  voltarParaChave(): void {
+    this.etapa.set('CHAVE');
+  }
+
+  trocarChave(): void {
+    this.invalidarDestinatario();
+    setTimeout(() => this.inputChave()?.nativeElement.focus());
+  }
+
+  private avisoTimeout: ReturnType<typeof setTimeout> | null = null;
+
+  mostrarEmBreve(): void {
+    this.aviso.set('Disponivel em breve.');
+    if (this.avisoTimeout) {
+      clearTimeout(this.avisoTimeout);
+    }
+    this.avisoTimeout = setTimeout(() => this.aviso.set(null), 2500);
   }
 
   selecionarTipoChave(tipo: 'CPF' | 'CELULAR'): void {
@@ -200,6 +232,7 @@ export class FormularioTransacao {
         this.nomeDestinatario = destinatario.nomeTitular;
         this.destinatarioResolvido.set(true);
         this.consultandoDestinatario.set(false);
+        setTimeout(() => this.botaoContinuar()?.nativeElement.focus());
       },
       error: (falha) => {
         if (versao !== this.versaoConsultaDestinatario) {
@@ -322,6 +355,7 @@ export class FormularioTransacao {
     this.estadoChave.set('INDEFINIDA');
     this.valorTransacaoTexto = 'R$ 0,00';
     this.descricao = '';
+    this.etapa.set('CHAVE');
     this.invalidarDestinatario();
   }
 

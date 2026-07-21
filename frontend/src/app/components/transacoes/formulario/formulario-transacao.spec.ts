@@ -282,4 +282,30 @@ describe('FormularioTransacao', () => {
       expect(component.nomeDestinatario).toBe('');
     });
   });
+
+  describe('etapas e avisos', () => {
+    it('avanca para a etapa de valor apos resolver a chave', () => {
+      const { component } = criarComponente('PIX', (request) =>
+        of({ nomeTitular: 'Ana Souza', tipoChavePix: request.tipoChavePix }));
+      digitar((e) => component.aoDigitarChave(e), '11987654321');
+      expect(component.destinatarioResolvido()).toBe(true);
+
+      component.avancarParaValor();
+      expect(component.etapa()).toBe('VALOR');
+    });
+
+    it('nao avanca enquanto o destinatario nao resolve', () => {
+      const { component } = criarComponente('PIX');
+
+      component.avancarParaValor();
+      expect(component.etapa()).toBe('CHAVE');
+    });
+
+    it('mostra aviso ao tocar num metodo indisponivel', () => {
+      const { component } = criarComponente('PIX');
+
+      component.mostrarEmBreve();
+      expect(component.aviso()).toBe('Disponivel em breve.');
+    });
+  });
 });
