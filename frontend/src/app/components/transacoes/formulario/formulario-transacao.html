@@ -87,12 +87,12 @@
               <span class="campo__entrada">
                 <app-icone class="campo__ic" [nome]="iconeChave()" [tamanho]="20" />
                 <input
-                  [value]="numeroContaDestino"
+                  [value]="chaveExibida"
                   (input)="aoDigitarChave($event)"
                   [placeholder]="placeholderChave()"
                   inputmode="text"
                 />
-                @if (numeroContaDestino) {
+                @if (chaveExibida) {
                   <app-icone class="campo__check" nome="check-circle" [tamanho]="20" />
                 }
               </span>

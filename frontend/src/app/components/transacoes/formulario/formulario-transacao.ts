@@ -76,7 +76,11 @@ export class FormularioTransacao {
     }
   });
 
+  // numeroContaDestino guarda a chave normalizada (so digitos p/ CPF e celular,
+  // trim p/ e-mail): e o que vai para resolucao, envio e idempotencia.
+  // chaveExibida guarda a versao mascarada, usada apenas no input.
   protected numeroContaDestino = '';
+  protected chaveExibida = '';
   protected valorTransacaoTexto = 'R$ 0,00';
   protected descricao = '';
 
@@ -112,32 +116,38 @@ export class FormularioTransacao {
   selecionarTipoChave(tipo: TipoChave): void {
     this.tipoChave.set(tipo);
     this.numeroContaDestino = '';
+    this.chaveExibida = '';
     this.resolverDestinatario();
   }
 
   aoDigitarChave(evento: Event): void {
     const alvo = evento.target as HTMLInputElement;
-    let valor = alvo.value;
-    if (this.tipoChave() === 'CPF') {
-      valor = this.mascaraCpf(valor);
-    } else if (this.tipoChave() === 'CELULAR') {
-      valor = this.mascaraTelefone(valor);
+    const digitado = alvo.value;
+
+    if (this.tipoChave() === 'EMAIL') {
+      this.chaveExibida = digitado;
+      this.numeroContaDestino = digitado.trim();
+    } else {
+      const cru = digitado.replace(/\D/g, '').slice(0, 11);
+      this.numeroContaDestino = cru;
+      this.chaveExibida =
+        this.tipoChave() === 'CPF' ? this.mascaraCpf(cru) : this.mascaraTelefone(cru);
     }
-    alvo.value = valor;
-    this.numeroContaDestino = valor;
+
+    alvo.value = this.chaveExibida;
     this.resolverDestinatario();
   }
 
   private resolverDestinatario(): void {
     // Mock: quando a chave estiver completa, o nome seria retornado pela consulta.
-    this.nomeDestinatario = this.chaveCompleta(this.numeroContaDestino) ? 'Ana Souza' : '';
+    this.nomeDestinatario = this.chaveCompleta() ? 'Ana Souza' : '';
   }
 
-  private chaveCompleta(chave: string): boolean {
+  private chaveCompleta(): boolean {
     if (this.tipoChave() === 'EMAIL') {
-      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(chave);
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.numeroContaDestino);
     }
-    return chave.replace(/\D/g, '').length === 11;
+    return this.numeroContaDestino.length === 11;
   }
 
   aoDigitarValor(evento: Event): void {
@@ -226,6 +236,7 @@ export class FormularioTransacao {
 
   private limparCampos(): void {
     this.numeroContaDestino = '';
+    this.chaveExibida = '';
     this.valorTransacaoTexto = 'R$ 0,00';
     this.descricao = '';
     this.nomeDestinatario = '';
