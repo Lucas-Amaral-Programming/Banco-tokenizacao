@@ -1,0 +1,37 @@
+<app-layout-banco>
+  <header class="hero" layout-cabecalho>
+    <div class="hero__top">
+      <button class="icon-btn" type="button" (click)="voltar()" aria-label="Voltar">
+        <app-icone nome="seta-esquerda" [tamanho]="22" />
+      </button>
+      <img class="hero__logo" src="logo-foursys.png" alt="foursys" />
+      <span class="icon-btn" aria-hidden="true"></span>
+    </div>
+
+    <h1 class="hero__titulo">Meus limites</h1>
+  </header>
+
+  <section class="conteudo" layout-conteudo>
+    <ul class="limites">
+      @for (limite of limites; track limite.titulo) {
+        <li class="limite">
+          <span class="limite__ic">
+            <app-icone [nome]="limite.icone" [tamanho]="22" />
+          </span>
+          <div class="limite__info">
+            <strong class="limite__titulo">{{ limite.titulo }}</strong>
+            <span class="limite__desc">{{ limite.descricao }}</span>
+          </div>
+          <span class="limite__valor">{{ limite.valor }}</span>
+        </li>
+      }
+    </ul>
+
+    <p class="nota">
+      <app-icone class="nota__ic" nome="shield" [tamanho]="20" />
+      Valores informativos. Ajuste de limites estará disponível em breve.
+    </p>
+  </section>
+
+  <app-bottom-nav layout-navegacao />
+</app-layout-banco>
