@@ -6,6 +6,7 @@ import { TransacaoResponse } from '../../../models/transacao-response.model';
 import { TransacaoService } from '../../../services/transacao.service';
 import { ContaService } from '../../../services/conta.service';
 import { Icone, NomeIcone } from '../../shared/icone/icone';
+import { LayoutBanco } from '../../shared/layout-banco/layout-banco';
 import { BottomNav } from '../../home/bottom-nav/bottom-nav';
 import { ContaOrigem } from '../conta-origem/conta-origem';
 import { cpfEhValido } from '../../../utils/cpf';
@@ -19,7 +20,7 @@ type EstadoChavePix = 'INDEFINIDA' | TipoChavePix | 'AMBIGUA' | 'INVALIDA';
 
 @Component({
   selector: 'app-formulario-transacao',
-  imports: [FormsModule, Icone, BottomNav, ContaOrigem],
+  imports: [FormsModule, Icone, BottomNav, ContaOrigem, LayoutBanco],
   templateUrl: './formulario-transacao.html',
   styleUrl: './formulario-transacao.scss'
 })

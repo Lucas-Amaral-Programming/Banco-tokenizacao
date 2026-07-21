@@ -1,11 +1,12 @@
 $laranja: #f4581e;
 
 .logo-img {
-  height: 48px;
+  height: var(--logo-altura, 48px);
   width: auto;
   display: block;
-  margin-left: 8px;
+  margin-left: var(--logo-margem-esquerda, 8px);
   object-fit: contain;
+  opacity: var(--logo-opacidade, 1);
 }
 
 .chevron {

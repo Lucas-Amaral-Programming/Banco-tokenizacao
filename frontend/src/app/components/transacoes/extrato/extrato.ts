@@ -5,13 +5,14 @@ import { TransacaoResponse } from '../../../models/transacao-response.model';
 import { TransacaoService } from '../../../services/transacao.service';
 import { ContaService } from '../../../services/conta.service';
 import { Icone } from '../../shared/icone/icone';
+import { LayoutBanco } from '../../shared/layout-banco/layout-banco';
 import { BottomNav } from '../../home/bottom-nav/bottom-nav';
 import { ExtratoResumo } from './resumo/extrato-resumo';
 import { TransacaoItem } from './transacao-item/transacao-item';
 
 @Component({
   selector: 'app-extrato',
-  imports: [RouterLink, Icone, BottomNav, ExtratoResumo, TransacaoItem],
+  imports: [RouterLink, Icone, BottomNav, ExtratoResumo, TransacaoItem, LayoutBanco],
   templateUrl: './extrato.html',
   styleUrl: './extrato.scss'
 })

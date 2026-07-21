@@ -1,10 +1,6 @@
-<main class="home">
-  <app-home-hero />
-
-  <div class="sheet">
-    <app-home-contas />
-    <app-home-cartoes />
-  </div>
-
-  <app-bottom-nav />
-</main>
+<app-layout-banco>
+  <app-home-hero layout-cabecalho />
+  <app-home-contas layout-conteudo />
+  <app-home-cartoes layout-conteudo />
+  <app-bottom-nav layout-navegacao />
+</app-layout-banco>

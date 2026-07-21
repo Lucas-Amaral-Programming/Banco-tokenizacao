@@ -34,6 +34,18 @@
   /* ---- Sombras ---- */
   --shadow-card: 0 2px 12px rgba(11, 42, 74, 0.06);
   --shadow-float: 0 8px 24px rgba(11, 42, 74, 0.12);
+  --shadow-screen: 0 30px 90px rgba(0, 10, 30, 0.42);
+  --shadow-sheet: 0 -18px 50px rgba(0, 10, 30, 0.2);
+
+  /* ---- Fundos ---- */
+  --background-navy-gradient:
+    radial-gradient(
+      circle at 50% 10%,
+      rgba(13, 73, 137, 0.82) 0,
+      rgba(6, 45, 91, 0.38) 25rem,
+      transparent 46rem
+    ),
+    linear-gradient(180deg, #062851 0%, #031f43 50%, #021a38 100%);
 
   /* ---- Espacamentos ---- */
   --space-1: 4px;

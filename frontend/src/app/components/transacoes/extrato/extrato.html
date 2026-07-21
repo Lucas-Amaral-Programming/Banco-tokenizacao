@@ -1,5 +1,5 @@
-<main class="tela">
-  <header class="hero">
+<app-layout-banco>
+  <header class="hero" layout-cabecalho>
     <div class="hero__top">
       <button class="icon-btn" type="button" (click)="voltar()" aria-label="Voltar">
         <app-icone nome="seta-esquerda" [tamanho]="22" />
@@ -28,7 +28,7 @@
     />
   </header>
 
-  <section class="lista">
+  <section class="lista" layout-conteudo>
     @if (carregando()) {
       <p class="aviso">Carregando...</p>
     } @else if (erro(); as mensagem) {
@@ -42,5 +42,5 @@
     }
   </section>
 
-  <app-bottom-nav />
-</main>
+  <app-bottom-nav layout-navegacao />
+</app-layout-banco>

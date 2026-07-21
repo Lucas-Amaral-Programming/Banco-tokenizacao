@@ -5,13 +5,20 @@ import br.com.foursys.tokenizacao.transacoes.dto.response.ContaResponse;
 import br.com.foursys.tokenizacao.transacoes.exception.ContaNaoEncontradaException;
 import br.com.foursys.tokenizacao.transacoes.exception.CpfInvalidoException;
 import br.com.foursys.tokenizacao.transacoes.exception.CpfJaCadastradoException;
+import br.com.foursys.tokenizacao.transacoes.exception.CpfObrigatorioException;
 import br.com.foursys.tokenizacao.transacoes.exception.EmailInvalidoException;
 import br.com.foursys.tokenizacao.transacoes.exception.EmailJaCadastradoException;
+import br.com.foursys.tokenizacao.transacoes.exception.EmailObrigatorioException;
+import br.com.foursys.tokenizacao.transacoes.exception.NomeIncompletoException;
+import br.com.foursys.tokenizacao.transacoes.exception.NomeObrigatorioException;
+import br.com.foursys.tokenizacao.transacoes.exception.SenhaObrigatoriaException;
 import br.com.foursys.tokenizacao.transacoes.exception.TelefoneInvalidoException;
 import br.com.foursys.tokenizacao.transacoes.exception.TelefoneJaCadastradoException;
+import br.com.foursys.tokenizacao.transacoes.exception.TelefoneObrigatorioException;
 import br.com.foursys.tokenizacao.transacoes.model.Conta;
 import br.com.foursys.tokenizacao.transacoes.util.ValidadorCpf;
 import br.com.foursys.tokenizacao.transacoes.util.ValidadorEmail;
+import br.com.foursys.tokenizacao.transacoes.util.ValidadorNome;
 import br.com.foursys.tokenizacao.transacoes.util.ValidadorTelefone;
 import br.com.foursys.tokenizacao.transacoes.model.StatusConta;
 import br.com.foursys.tokenizacao.transacoes.repository.ContaRepository;
@@ -40,6 +47,25 @@ public class ContaService {
 
     @Transactional
     public ContaResponse cadastrar(CadastroContaRequest request) {
+        if (request.nomeTitular() == null || request.nomeTitular().isBlank()) {
+            throw new NomeObrigatorioException();
+        }
+        if (!ValidadorNome.ehCompleto(request.nomeTitular())) {
+            throw new NomeIncompletoException();
+        }
+        if (request.cpf() == null || request.cpf().isBlank()) {
+            throw new CpfObrigatorioException();
+        }
+        if (request.telefone() == null || request.telefone().isBlank()) {
+            throw new TelefoneObrigatorioException();
+        }
+        if (request.email() == null || request.email().isBlank()) {
+            throw new EmailObrigatorioException();
+        }
+        if (request.senha() == null || request.senha().isBlank()) {
+            throw new SenhaObrigatoriaException();
+        }
+
         String cpf = apenasDigitos(request.cpf());
         if (!ValidadorCpf.ehValido(cpf)) {
             throw new CpfInvalidoException();
@@ -48,7 +74,7 @@ public class ContaService {
         if (!ValidadorTelefone.ehValido(telefone)) {
             throw new TelefoneInvalidoException();
         }
-        String email = request.email() == null ? "" : request.email().trim().toLowerCase(Locale.ROOT);
+        String email = request.email().trim().toLowerCase(Locale.ROOT);
         if (!ValidadorEmail.ehValido(email)) {
             throw new EmailInvalidoException();
         }

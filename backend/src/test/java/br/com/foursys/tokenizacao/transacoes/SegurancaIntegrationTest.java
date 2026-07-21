@@ -192,7 +192,7 @@ class SegurancaIntegrationTest {
     @Test
     void fluxoCompletoCadastroLoginTransacaoExtratoLogout() throws Exception {
         String cpf = "39053344705";
-        String numeroConta = cadastrar("Cliente E2E", cpf, "11977770002", "e2e@teste.com");
+        String numeroConta = cadastrar("Cliente Teste", cpf, "11977770002", "e2e@teste.com");
 
         MockHttpSession sessao = login(cpf, SENHA);
 

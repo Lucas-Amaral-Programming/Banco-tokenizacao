@@ -13,31 +13,31 @@ public class TratadorDeErros {
 
     @ExceptionHandler(RegraNegocioException.class)
     public ResponseEntity<ErroResposta> tratarRegraNegocio(RegraNegocioException excecao) {
-        return montar(HttpStatus.BAD_REQUEST, excecao.getMessage());
+        return montar(HttpStatus.BAD_REQUEST, excecao.getMessage(), excecao.getCampo());
     }
 
     @ExceptionHandler(PayloadIdempotenciaDivergenteException.class)
     public ResponseEntity<ErroResposta> tratarPayloadDivergente(PayloadIdempotenciaDivergenteException excecao) {
-        return montar(HttpStatus.UNPROCESSABLE_ENTITY, excecao.getMessage());
+        return montar(HttpStatus.UNPROCESSABLE_ENTITY, excecao.getMessage(), null);
     }
 
     @ExceptionHandler(ConflitoConcorrenciaException.class)
     public ResponseEntity<ErroResposta> tratarConflitoConcorrencia(ConflitoConcorrenciaException excecao) {
-        return montar(HttpStatus.CONFLICT, excecao.getMessage());
+        return montar(HttpStatus.CONFLICT, excecao.getMessage(), null);
     }
 
     @ExceptionHandler(AccountStatusException.class)
     public ResponseEntity<ErroResposta> tratarContaBloqueada(AccountStatusException excecao) {
-        return montar(HttpStatus.FORBIDDEN, "Conta indisponivel para login.");
+        return montar(HttpStatus.FORBIDDEN, "Conta indisponivel para login.", null);
     }
 
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<ErroResposta> tratarCredenciaisInvalidas(AuthenticationException excecao) {
-        return montar(HttpStatus.UNAUTHORIZED, "CPF ou senha invalidos.");
+        return montar(HttpStatus.UNAUTHORIZED, "CPF ou senha invalidos.", null);
     }
 
-    private ResponseEntity<ErroResposta> montar(HttpStatus status, String mensagem) {
-        ErroResposta erro = new ErroResposta(mensagem, status.value(), LocalDateTime.now());
+    private ResponseEntity<ErroResposta> montar(HttpStatus status, String mensagem, String campo) {
+        ErroResposta erro = new ErroResposta(mensagem, campo, status.value(), LocalDateTime.now());
         return ResponseEntity.status(status).body(erro);
     }
 }

@@ -1,7 +1,7 @@
 <label class="campo">
   <span class="rotulo">{{ rotulo() }}</span>
 
-  <span class="entrada">
+  <span class="entrada" [class.entrada--erro]="erro()">
     <svg class="icone-campo" viewBox="0 0 24 24" aria-hidden="true">
       @switch (icone()) {
         @case ('usuario') {
@@ -31,7 +31,8 @@
     </svg>
 
     @if (tipo() === 'select') {
-      <select [value]="valor()" (change)="atualizar($event)">
+      <select [value]="valor()" (change)="atualizar($event)"
+              [attr.aria-invalid]="erro() ? true : null">
         @for (opcao of opcoes(); track opcao) {
           <option [value]="opcao">{{ opcao }}</option>
         }
@@ -39,6 +40,7 @@
     } @else {
       <input [type]="tipoInput" [value]="valor()" (input)="atualizar($event)"
              [placeholder]="placeholder()"
+             [attr.aria-invalid]="erro() ? true : null"
              [attr.inputmode]="mascara() === 'cpf' || mascara() === 'celular' || mascara() === 'moeda' ? 'numeric' : null"
              [attr.maxlength]="mascara() === 'cpf' ? 14 : mascara() === 'celular' ? 15 : mascara() === 'moeda' ? 20 : null" />
     }
@@ -57,7 +59,9 @@
     }
   </span>
 
-  @if (ajuda()) {
+  @if (erro(); as mensagem) {
+    <span class="msg-erro" role="alert">{{ mensagem }}</span>
+  } @else if (ajuda()) {
     <span class="ajuda">{{ ajuda() }}</span>
   }
 </label>

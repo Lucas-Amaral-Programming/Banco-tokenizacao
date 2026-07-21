@@ -1,4 +1,8 @@
-<div class="pagina">
+<div
+  class="pagina"
+  [class.pagina--destaque]="variante() !== 'padrao'"
+  [class.pagina--cadastro-destaque]="variante() === 'cadastro-destaque'"
+  [class.pagina--login-destaque]="variante() === 'login-destaque'">
   <header class="topo">
     <app-logo />
   </header>

@@ -2,40 +2,49 @@ $laranja: #f4581e;
 $texto: #1f2a37;
 $cinza: #6b7280;
 $borda: #e3e6eb;
+$erro: #d32f2f;
 
 .campo {
   display: flex;
   flex-direction: column;
-  gap: 0.45rem;
+  gap: var(--campo-gap, 0.45rem);
 }
 
 .rotulo {
-  font-size: 0.9rem;
+  font-size: var(--campo-rotulo-tamanho, 0.9rem);
   font-weight: 700;
-  color: $texto;
+  color: var(--campo-rotulo-cor, #{$texto});
 }
 
 .entrada {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  border: 1px solid $borda;
-  border-radius: 12px;
-  padding: 0 0.85rem;
+  gap: var(--campo-entrada-gap, 0.5rem);
+  min-height: var(--campo-altura, auto);
+  border: 1px solid var(--campo-borda, #{$borda});
+  border-radius: var(--campo-raio, 12px);
+  padding: var(--campo-padding, 0 0.85rem);
+  background: var(--campo-fundo, transparent);
   transition: border-color 0.15s, box-shadow 0.15s;
 }
 
 .entrada:focus-within {
-  border-color: $laranja;
-  box-shadow: 0 0 0 3px rgba(244, 88, 30, 0.12);
+  border-color: var(--campo-foco-borda, #{$laranja});
+  box-shadow: var(--campo-foco-sombra, 0 0 0 3px rgba(244, 88, 30, 0.12));
+}
+
+.entrada--erro,
+.entrada--erro:focus-within {
+  border-color: $erro;
+  box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.14);
 }
 
 .icone-campo {
-  width: 18px;
-  height: 18px;
+  width: var(--campo-icone-tamanho, 18px);
+  height: var(--campo-icone-tamanho, 18px);
   flex-shrink: 0;
   fill: none;
-  stroke: $cinza;
+  stroke: var(--campo-icone-cor, #{$cinza});
   stroke-width: 2;
   stroke-linecap: round;
   stroke-linejoin: round;
@@ -46,10 +55,11 @@ $borda: #e3e6eb;
   flex: 1;
   border: none;
   outline: none;
-  padding: 0.65rem 0.2rem;
-  font-size: 1rem;
+  min-width: 0;
+  padding: var(--campo-input-padding, 0.65rem 0.2rem);
+  font-size: var(--campo-input-tamanho, 1rem);
   background: transparent;
-  color: $texto;
+  color: var(--campo-texto-cor, #{$texto});
 }
 
 .entrada input::-ms-reveal,
@@ -67,10 +77,10 @@ $borda: #e3e6eb;
 }
 
 .olho svg {
-  width: 18px;
-  height: 18px;
+  width: var(--campo-olho-tamanho, 18px);
+  height: var(--campo-olho-tamanho, 18px);
   fill: none;
-  stroke: $cinza;
+  stroke: var(--campo-icone-cor, #{$cinza});
   stroke-width: 2;
   stroke-linecap: round;
   stroke-linejoin: round;
@@ -79,4 +89,10 @@ $borda: #e3e6eb;
 .ajuda {
   font-size: 0.8rem;
   color: $cinza;
+}
+
+.msg-erro {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: $erro;
 }

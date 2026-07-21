@@ -273,3 +273,199 @@ $fundo: #f3f5f8;
     padding: 1.75rem;
   }
 }
+
+/* ===== Variante de destaque usada somente no login ===== */
+.pagina--destaque {
+  min-height: 100svh;
+  padding: clamp(2rem, 5vw, 4.5rem) clamp(1rem, 4vw, 2.5rem) 1.5rem;
+  gap: clamp(1.75rem, 4vw, 3rem);
+  background:
+    radial-gradient(circle at 50% 13%, rgba(13, 73, 137, 0.82) 0, rgba(6, 45, 91, 0.38) 25rem, transparent 46rem),
+    linear-gradient(180deg, #062851 0%, #031f43 50%, #021a38 100%);
+  color: #fff;
+}
+
+.pagina--destaque .topo {
+  justify-content: center;
+  width: 100%;
+}
+
+.pagina--destaque .topo app-logo {
+  --logo-altura: clamp(64px, 8vw, 92px);
+  --logo-margem-esquerda: 0;
+  --logo-opacidade: 0;
+  display: block;
+  line-height: 0;
+  background: url("/logo-foursys.png") center / contain no-repeat;
+}
+
+.pagina--destaque .conteudo {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(2rem, 4vw, 3.25rem);
+  align-items: stretch;
+  max-width: 720px;
+}
+
+.pagina--destaque .marketing {
+  display: block;
+  text-align: center;
+}
+
+.pagina--destaque .marketing h2 {
+  color: #fff;
+  font-size: clamp(2rem, 5vw, 2.8rem);
+  line-height: 1.12;
+  margin-bottom: 1.1rem;
+  text-wrap: balance;
+}
+
+.pagina--destaque .marketing .destaque {
+  color: #ff5b12;
+}
+
+.pagina--destaque .marketing p {
+  max-width: 600px;
+  margin: 0 auto;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: clamp(1rem, 2.5vw, 1.2rem);
+  line-height: 1.65;
+  text-wrap: balance;
+}
+
+.pagina--destaque .cartao {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+  padding: 0;
+  background: transparent;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.pagina--destaque .form-area {
+  padding: clamp(1.5rem, 5vw, 2.75rem);
+  background: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  border-radius: 22px;
+  box-shadow: 0 28px 70px rgba(0, 10, 30, 0.32);
+}
+
+.pagina--destaque .form-area h1 {
+  color: #08254d;
+  font-size: clamp(1.65rem, 4vw, 2rem);
+}
+
+.pagina--destaque .form-area .risco {
+  margin-bottom: 1.5rem;
+  background: #ff5b12;
+}
+
+.pagina--destaque .divisor {
+  width: 100%;
+  height: 1px;
+  margin: clamp(2.5rem, 6vw, 4rem) 0 clamp(2rem, 5vw, 3rem);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.36) 20%, rgba(255, 255, 255, 0.36) 80%, transparent);
+}
+
+.pagina--destaque app-beneficios {
+  --beneficios-colunas: repeat(3, minmax(0, 1fr));
+  --beneficios-gap: 0;
+  --beneficio-direcao: column;
+  --beneficio-gap: 0.8rem;
+  --beneficio-alinhamento: center;
+  --beneficio-justificacao: flex-start;
+  --beneficio-padding: 0 1.2rem;
+  --beneficio-texto-alinhamento: center;
+  --beneficio-separador: 1px solid rgba(255, 255, 255, 0.22);
+  --beneficio-icone-caixa: 58px;
+  --beneficio-icone-tamanho: 28px;
+  --beneficio-icone-fundo: rgba(255, 255, 255, 0.025);
+  --beneficio-icone-borda: 1px solid rgba(255, 255, 255, 0.25);
+  --beneficio-icone-cor: #ff5b12;
+  --beneficio-titulo-cor: #fff;
+  --beneficio-texto-cor: rgba(255, 255, 255, 0.75);
+  --beneficio-texto-tamanho: 0.9rem;
+}
+
+.pagina--destaque .rodape {
+  display: block;
+  max-width: 720px;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.95rem;
+}
+
+.pagina--cadastro-destaque .conteudo,
+.pagina--cadastro-destaque .rodape {
+  max-width: 920px;
+}
+
+.pagina--destaque .rodape-conteudo {
+  display: flex;
+  justify-content: center;
+  gap: clamp(1.25rem, 5vw, 3rem);
+}
+
+.pagina--destaque .rodape .item {
+  gap: 0.65rem;
+}
+
+.pagina--destaque .rodape svg {
+  width: 21px;
+  height: 21px;
+  stroke: rgba(255, 255, 255, 0.78);
+}
+
+.pagina--destaque .rodape .sep {
+  color: rgba(255, 255, 255, 0.28);
+}
+
+@media (max-width: 560px) {
+  .pagina--destaque {
+    padding: 1.75rem 1rem 1.25rem;
+    gap: 1.75rem;
+  }
+
+  .pagina--destaque .conteudo {
+    gap: 2rem;
+  }
+
+  .pagina--destaque .marketing h2 {
+    font-size: clamp(1.8rem, 8vw, 2.25rem);
+  }
+
+  .pagina--destaque .form-area {
+    padding: 1.5rem;
+    border-radius: 20px;
+  }
+
+  .pagina--destaque app-beneficios {
+    --beneficio-padding: 0 0.65rem;
+    --beneficio-icone-caixa: 50px;
+    --beneficio-icone-tamanho: 24px;
+    --beneficio-texto-tamanho: 0.78rem;
+  }
+
+  .pagina--destaque .rodape-conteudo {
+    font-size: 0.82rem;
+  }
+}
+
+@media (max-width: 359px) {
+  .pagina--destaque app-beneficios {
+    --beneficio-padding: 0.75rem 0;
+    --beneficio-texto-alinhamento: left;
+  }
+
+  .pagina--destaque .rodape-conteudo {
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+
+  .pagina--destaque .rodape .sep {
+    display: none;
+  }
+}

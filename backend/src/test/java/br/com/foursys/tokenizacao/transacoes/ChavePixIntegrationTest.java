@@ -7,6 +7,8 @@ import br.com.foursys.tokenizacao.transacoes.dto.request.CadastroContaRequest;
 import br.com.foursys.tokenizacao.transacoes.dto.request.TransacaoRequest;
 import br.com.foursys.tokenizacao.transacoes.exception.ChavePixInvalidaException;
 import br.com.foursys.tokenizacao.transacoes.exception.ChavePixNaoEncontradaException;
+import br.com.foursys.tokenizacao.transacoes.exception.NomeIncompletoException;
+import br.com.foursys.tokenizacao.transacoes.exception.NomeObrigatorioException;
 import br.com.foursys.tokenizacao.transacoes.model.ChavePix;
 import br.com.foursys.tokenizacao.transacoes.model.Conta;
 import br.com.foursys.tokenizacao.transacoes.model.StatusConta;
@@ -65,7 +67,7 @@ class ChavePixIntegrationTest {
     @Test
     void cadastroNormalizaERegistraAsTresChaves() {
         contaService.cadastrar(new CadastroContaRequest(
-                "Maria", "529.982.247-25", "(11) 98765-4321",
+                "Maria Silva", "529.982.247-25", "(11) 98765-4321",
                 " MARIA@EMAIL.COM ", TipoConta.CORRENTE, "12345678"));
 
         Long idConta = contaRepository.findByCpf("52998224725").orElseThrow().getIdConta();
@@ -76,6 +78,26 @@ class ChavePixIntegrationTest {
                 .isEqualTo(idConta);
         assertThat(chavePixService.resolver(TipoChavePix.CELULAR, "11987654321").getIdConta())
                 .isEqualTo(idConta);
+    }
+
+    @Test
+    void cadastroRejeitaNomeObrigatorio() {
+        assertThatThrownBy(() -> contaService.cadastrar(new CadastroContaRequest(
+                "   ", "52998224725", "11987654321",
+                "maria@email.com", TipoConta.CORRENTE, "12345678")))
+                .isInstanceOf(NomeObrigatorioException.class);
+
+        assertThat(contaRepository.findByCpf("52998224725")).isEmpty();
+    }
+
+    @Test
+    void cadastroRejeitaNomeIncompleto() {
+        assertThatThrownBy(() -> contaService.cadastrar(new CadastroContaRequest(
+                "Maria", "52998224725", "11987654321",
+                "maria@email.com", TipoConta.CORRENTE, "12345678")))
+                .isInstanceOf(NomeIncompletoException.class);
+
+        assertThat(contaRepository.findByCpf("52998224725")).isEmpty();
     }
 
     @Test
@@ -150,7 +172,7 @@ class ChavePixIntegrationTest {
                 .build());
 
         assertThatThrownBy(() -> contaService.cadastrar(new CadastroContaRequest(
-                "Nova", "11144477735", "21987654321", "duplicado@teste.com",
+                "Nova Cliente", "11144477735", "21987654321", "duplicado@teste.com",
                 TipoConta.CORRENTE, "12345678")))
                 .isInstanceOf(DataIntegrityViolationException.class);
 

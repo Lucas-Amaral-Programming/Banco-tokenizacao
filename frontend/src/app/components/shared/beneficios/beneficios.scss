@@ -6,32 +6,41 @@ $cinza: #6b7280;
   list-style: none;
   margin: 0;
   padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 1.75rem;
+  display: grid;
+  grid-template-columns: var(--beneficios-colunas, 1fr);
+  gap: var(--beneficios-gap, 1.75rem);
 }
 
 .beneficios li {
   display: flex;
-  gap: 0.9rem;
-  align-items: flex-start;
+  flex-direction: var(--beneficio-direcao, row);
+  gap: var(--beneficio-gap, 0.9rem);
+  align-items: var(--beneficio-alinhamento, flex-start);
+  justify-content: var(--beneficio-justificacao, flex-start);
+  padding: var(--beneficio-padding, 0);
+  text-align: var(--beneficio-texto-alinhamento, left);
+}
+
+.beneficios li + li {
+  border-inline-start: var(--beneficio-separador, 0);
 }
 
 .icone {
   flex-shrink: 0;
-  width: 46px;
-  height: 46px;
+  width: var(--beneficio-icone-caixa, 46px);
+  height: var(--beneficio-icone-caixa, 46px);
   border-radius: 50%;
-  background: rgba(244, 88, 30, 0.12);
+  background: var(--beneficio-icone-fundo, rgba(244, 88, 30, 0.12));
+  border: var(--beneficio-icone-borda, 0);
   display: grid;
   place-items: center;
 }
 
 .icone svg {
-  width: 22px;
-  height: 22px;
+  width: var(--beneficio-icone-tamanho, 22px);
+  height: var(--beneficio-icone-tamanho, 22px);
   fill: none;
-  stroke: $laranja;
+  stroke: var(--beneficio-icone-cor, #{$laranja});
   stroke-width: 2;
   stroke-linecap: round;
   stroke-linejoin: round;
@@ -39,12 +48,30 @@ $cinza: #6b7280;
 
 .beneficios strong {
   display: block;
-  color: $navy;
+  color: var(--beneficio-titulo-cor, #{$navy});
   margin-bottom: 0.2rem;
 }
 
 .beneficios span {
-  color: $cinza;
-  font-size: 0.88rem;
+  color: var(--beneficio-texto-cor, #{$cinza});
+  font-size: var(--beneficio-texto-tamanho, 0.88rem);
   line-height: 1.4;
+}
+
+@media (max-width: 359px) {
+  .beneficios {
+    grid-template-columns: 1fr;
+  }
+
+  .beneficios li {
+    flex-direction: row;
+    justify-content: flex-start;
+    padding: 0.75rem 0;
+    text-align: left;
+  }
+
+  .beneficios li + li {
+    border-inline-start: 0;
+    border-block-start: var(--beneficio-separador, 0);
+  }
 }

@@ -18,6 +18,7 @@ export class CampoFormulario {
   readonly opcoes = input<string[]>([]);
   readonly ajuda = input('');
   readonly mascara = input<MascaraCampo>(null);
+  readonly erro = input<string | null>(null);
 
   readonly valor = model<string>('');
 

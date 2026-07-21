@@ -3,14 +3,41 @@ $navy: #16304c;
 $cinza: #6b7280;
 
 .subtitulo-form {
-  margin: -0.5rem 0 1rem;
+  margin: -0.5rem 0 1.4rem;
   color: $cinza;
+  line-height: 1.5;
 }
 
 .formulario {
-  display: flex;
-  flex-direction: column;
-  gap: 0.8rem;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem;
+  align-items: start;
+}
+
+app-campo-formulario {
+  display: block;
+  min-width: 0;
+  --campo-gap: 0.65rem;
+  --campo-altura: 64px;
+  --campo-borda: #cbd5e1;
+  --campo-raio: 14px;
+  --campo-padding: 0 1.05rem;
+  --campo-entrada-gap: 0.9rem;
+  --campo-rotulo-tamanho: 0.95rem;
+  --campo-rotulo-cor: #08254d;
+  --campo-icone-tamanho: 22px;
+  --campo-olho-tamanho: 22px;
+  --campo-icone-cor: #5e6d83;
+  --campo-input-tamanho: 1rem;
+  --campo-texto-cor: #101828;
+  --campo-foco-borda: #{$laranja};
+  --campo-foco-sombra: 0 0 0 4px rgba(244, 88, 30, 0.14);
+}
+
+.campo--largura-total,
+.acao--largura-total {
+  grid-column: 1 / -1;
 }
 
 .botao-principal {
@@ -19,31 +46,43 @@ $cinza: #6b7280;
   justify-content: center;
   gap: 0.5rem;
   width: 100%;
-  margin-top: 0.5rem;
-  padding: 0.9rem;
+  min-height: 64px;
+  margin-top: 0.35rem;
+  padding: 1rem;
   border: none;
-  border-radius: 12px;
-  background: $laranja;
+  border-radius: 14px;
+  background: linear-gradient(90deg, #ff570b 0%, #ff6813 100%);
   color: #fff;
-  font-size: 1rem;
+  font-size: 1.08rem;
   font-weight: 700;
   cursor: pointer;
   text-decoration: none;
-  transition: background 0.15s;
+  box-shadow: 0 10px 24px rgba(244, 88, 30, 0.2);
+  transition: transform 0.15s, box-shadow 0.15s, filter 0.15s;
 }
 
 .botao-principal:hover {
-  background: #e04d16;
+  filter: brightness(0.95);
+  box-shadow: 0 12px 28px rgba(244, 88, 30, 0.27);
+  transform: translateY(-1px);
+}
+
+.botao-principal:focus-visible {
+  outline: 3px solid rgba(244, 88, 30, 0.3);
+  outline-offset: 3px;
 }
 
 .botao-principal:disabled {
   opacity: 0.7;
   cursor: default;
+  filter: none;
+  transform: none;
+  box-shadow: none;
 }
 
 .botao-principal svg {
-  width: 18px;
-  height: 18px;
+  width: 22px;
+  height: 22px;
   fill: none;
   stroke: #fff;
   stroke-width: 2.2;
@@ -57,7 +96,7 @@ $cinza: #6b7280;
   text-align: center;
   color: $cinza;
   font-size: 0.85rem;
-  margin: 1.25rem 0 0.5rem;
+  margin: 1.5rem 0 0.65rem;
 }
 
 .ou::before,
@@ -74,8 +113,8 @@ $cinza: #6b7280;
 
 .rodape-form {
   text-align: center;
-  font-size: 0.9rem;
-  color: $cinza;
+  font-size: 0.98rem;
+  color: #102a4e;
   margin: 0;
 }
 
@@ -85,25 +124,89 @@ $cinza: #6b7280;
   text-decoration: none;
 }
 
+.rodape-form a:focus-visible {
+  outline: 2px solid rgba(244, 88, 30, 0.45);
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+
 .erro {
-  margin: 0.5rem 0 0;
+  margin: 1rem 0 0;
   color: #b71c1c;
   text-align: center;
 }
 
 .sucesso {
   text-align: center;
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 0.75rem 0 0.25rem;
 }
 
-.sucesso .numero {
-  font-size: 2rem;
-  font-weight: 800;
-  letter-spacing: 3px;
-  color: $laranja;
-  margin: 0.5rem 0;
+.sucesso-icone {
+  display: grid;
+  place-items: center;
+  width: 76px;
+  height: 76px;
+  margin: 0 auto 1.25rem;
+  border-radius: 50%;
+  background: rgba(244, 88, 30, 0.12);
+}
+
+.sucesso-icone svg {
+  width: 40px;
+  height: 40px;
+  fill: none;
+  stroke: $laranja;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.sucesso h2 {
+  margin: 0;
+  color: $navy;
+  font-size: clamp(1.5rem, 4vw, 2rem);
 }
 
 .sucesso .aviso {
   color: $cinza;
-  margin-bottom: 1.5rem;
+  margin: 0.75rem auto 1.75rem;
+  line-height: 1.6;
+}
+
+.sucesso .botao-principal {
+  max-width: 340px;
+  margin-inline: auto;
+}
+
+@media (max-width: 767px) {
+  .formulario {
+    grid-template-columns: 1fr;
+  }
+
+  .campo--largura-total,
+  .acao--largura-total {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 560px) {
+  .subtitulo-form {
+    margin-bottom: 1.1rem;
+  }
+
+  .formulario {
+    gap: 1.1rem;
+  }
+
+  app-campo-formulario {
+    --campo-altura: 60px;
+    --campo-padding: 0 0.9rem;
+    --campo-entrada-gap: 0.75rem;
+  }
+
+  .botao-principal {
+    min-height: 58px;
+  }
 }

@@ -17,7 +17,7 @@ final class RespostaSegurancaJson {
         response.setStatus(codigoHttp);
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");
-        ErroResposta erro = new ErroResposta(mensagem, codigoHttp, LocalDateTime.now());
+        ErroResposta erro = new ErroResposta(mensagem, null, codigoHttp, LocalDateTime.now());
         objectMapper.writeValue(response.getWriter(), erro);
     }
 }

@@ -1,6 +1,6 @@
 @if (tipoTransacao() === 'PIX') {
-  <main class="pix">
-    <header class="hero">
+  <app-layout-banco>
+    <header class="hero" layout-cabecalho>
       <div class="hero__top">
         <button class="icon-btn" type="button" (click)="voltar()" aria-label="Voltar">
           <app-icone nome="seta-esquerda" [tamanho]="22" />
@@ -43,9 +43,8 @@
       <app-conta-origem [conta]="contaAtual()" />
     </header>
 
-    <div class="folha">
-      @if (aba() === 'CHAVE') {
-        <form class="form" (ngSubmit)="enviar()">
+    @if (aba() === 'CHAVE') {
+        <form class="form" layout-conteudo (ngSubmit)="enviar()">
           <section class="cartao">
             <h2 class="cartao__titulo">1. Dados do destinatário</h2>
 
@@ -151,17 +150,16 @@
           }
         </form>
       } @else {
-        <section class="cartao">
+        <section class="cartao" layout-conteudo>
           <p class="indisponivel">Disponível em breve.</p>
         </section>
       }
-    </div>
 
-    <app-bottom-nav />
-  </main>
+    <app-bottom-nav layout-navegacao />
+  </app-layout-banco>
 } @else if (tipoTransacao() === 'DEPOSITO') {
-  <main class="pix">
-    <header class="hero">
+  <app-layout-banco>
+    <header class="hero" layout-cabecalho>
       <div class="hero__top">
         <button class="icon-btn" type="button" (click)="voltar()" aria-label="Voltar">
           <app-icone nome="seta-esquerda" [tamanho]="22" />
@@ -177,8 +175,7 @@
       <app-conta-origem [conta]="contaAtual()" rotulo="Conta de destino" icone="deposito" />
     </header>
 
-    <div class="folha">
-      <form class="form" (ngSubmit)="enviar()">
+      <form class="form" layout-conteudo (ngSubmit)="enviar()">
         <section class="cartao">
           <h2 class="cartao__titulo">Valor</h2>
 
@@ -230,13 +227,12 @@
           <div class="resultado resultado--erro">{{ mensagem }}</div>
         }
       </form>
-    </div>
 
-    <app-bottom-nav />
-  </main>
+    <app-bottom-nav layout-navegacao />
+  </app-layout-banco>
 } @else if (tipoTransacao() === 'SAQUE') {
-  <main class="pix">
-    <header class="hero">
+  <app-layout-banco>
+    <header class="hero" layout-cabecalho>
       <div class="hero__top">
         <button class="icon-btn" type="button" (click)="voltar()" aria-label="Voltar">
           <app-icone nome="seta-esquerda" [tamanho]="22" />
@@ -252,8 +248,7 @@
       <app-conta-origem [conta]="contaAtual()" rotulo="Conta de origem" />
     </header>
 
-    <div class="folha">
-      <form class="form" (ngSubmit)="enviar()">
+      <form class="form" layout-conteudo (ngSubmit)="enviar()">
         <section class="cartao">
           <h2 class="cartao__titulo">Valor</h2>
 
@@ -305,10 +300,9 @@
           <div class="resultado resultado--erro">{{ mensagem }}</div>
         }
       </form>
-    </div>
 
-    <app-bottom-nav />
-  </main>
+    <app-bottom-nav layout-navegacao />
+  </app-layout-banco>
 } @else {
   <p class="resultado erro">Tipo de transacao invalido.</p>
 }

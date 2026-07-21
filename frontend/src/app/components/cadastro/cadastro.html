@@ -1,6 +1,12 @@
-<app-layout-auth tituloCartao="Criar conta">
+<app-layout-auth tituloCartao="Criar conta" variante="cadastro-destaque">
   @if (contaCriada()) {
-    <div class="sucesso">
+    <div class="sucesso" aria-live="polite">
+      <span class="sucesso-icone" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="9" />
+          <path d="M8 12l2.5 2.5L16 9" />
+        </svg>
+      </span>
       <h2>Cadastro concluido!</h2>
       <p class="aviso">Sua conta foi criada. Faca login com seu CPF e senha.</p>
       <a class="botao-principal" routerLink="/login">Ir para login</a>
@@ -9,25 +15,29 @@
     <p class="subtitulo-form">Preencha seus dados para abrir sua conta digital.</p>
 
     <form class="formulario" (submit)="cadastrar(); $event.preventDefault()">
-      <app-campo-formulario
+      <app-campo-formulario class="campo--largura-total"
         rotulo="Nome completo" icone="usuario"
         placeholder="Digite seu nome completo"
+        [erro]="erros().nomeTitular"
         [(valor)]="dados.nomeTitular" />
 
       <app-campo-formulario
         rotulo="CPF" icone="documento" mascara="cpf"
         placeholder="Digite seu CPF"
+        [erro]="erros().cpf"
         [(valor)]="dados.cpf" />
 
       <app-campo-formulario
         rotulo="Celular" icone="celular" mascara="celular"
         placeholder="(11) 99999-9999"
+        [erro]="erros().telefone"
         [(valor)]="dados.telefone" />
 
       <app-campo-formulario
         rotulo="E-mail" icone="email"
         placeholder="Digite seu e-mail"
         ajuda="Sera usado tambem como chave PIX."
+        [erro]="erros().email"
         [(valor)]="dados.email" />
 
       <app-campo-formulario
@@ -35,20 +45,21 @@
         [opcoes]="tiposConta"
         [valor]="dados.tipoConta" (valorChange)="dados.tipoConta = $any($event)" />
 
-      <app-campo-formulario
+      <app-campo-formulario class="campo--largura-total"
         rotulo="Senha" icone="cadeado" tipo="senha"
         placeholder="Digite sua senha"
         ajuda="Use pelo menos 8 caracteres com letras e numeros."
+        [erro]="erros().senha"
         [(valor)]="dados.senha" />
 
-      <button class="botao-principal" type="submit" [disabled]="carregando()">
+      <button class="botao-principal acao--largura-total" type="submit" [disabled]="carregando()">
         {{ carregando() ? 'Cadastrando...' : 'Cadastrar' }}
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
       </button>
     </form>
 
-    @if (erro(); as mensagem) {
-      <p class="erro">{{ mensagem }}</p>
+    @if (erroGeral(); as mensagem) {
+      <p class="erro" role="alert">{{ mensagem }}</p>
     }
 
     <div class="ou"><span>ou</span></div>

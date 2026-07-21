@@ -4,9 +4,20 @@ import { CadastroContaRequest, ContaResponse, TipoConta } from '../../models/con
 import { ContaService } from '../../services/conta.service';
 import { cpfEhValido } from '../../utils/cpf';
 import { emailEhValido } from '../../utils/email';
+import { nomeEhCompleto } from '../../utils/nome';
 import { telefoneEhValido } from '../../utils/telefone';
 import { CampoFormulario } from '../shared/campo-formulario/campo-formulario';
 import { LayoutAuth } from '../shared/layout-auth/layout-auth';
+
+type CampoErro = 'nomeTitular' | 'cpf' | 'telefone' | 'email' | 'senha';
+
+const SEM_ERROS: Record<CampoErro, string | null> = {
+  nomeTitular: null,
+  cpf: null,
+  telefone: null,
+  email: null,
+  senha: null
+};
 
 @Component({
   selector: 'app-cadastro',
@@ -29,22 +40,42 @@ export class Cadastro {
   };
 
   protected readonly contaCriada = signal<ContaResponse | null>(null);
-  protected readonly erro = signal<string | null>(null);
+  protected readonly erros = signal<Record<CampoErro, string | null>>({ ...SEM_ERROS });
+  protected readonly erroGeral = signal<string | null>(null);
   protected readonly carregando = signal(false);
 
   cadastrar(): void {
-    this.erro.set(null);
+    this.erros.set({ ...SEM_ERROS });
+    this.erroGeral.set(null);
 
-    if (!cpfEhValido(this.dados.cpf)) {
-      this.erro.set('CPF invalido.');
-      return;
+    const erros = { ...SEM_ERROS };
+
+    if (!this.dados.nomeTitular.trim()) {
+      erros.nomeTitular = 'Informe o nome do titular.';
+    } else if (!nomeEhCompleto(this.dados.nomeTitular)) {
+      erros.nomeTitular = 'Informe o nome completo (nome e sobrenome).';
     }
-    if (!telefoneEhValido(this.dados.telefone)) {
-      this.erro.set('Celular invalido.');
-      return;
+    if (!this.dados.cpf.trim()) {
+      erros.cpf = 'Informe o CPF.';
+    } else if (!cpfEhValido(this.dados.cpf)) {
+      erros.cpf = 'CPF invalido.';
     }
-    if (!emailEhValido(this.dados.email)) {
-      this.erro.set('E-mail invalido.');
+    if (!this.dados.telefone.trim()) {
+      erros.telefone = 'Informe o celular.';
+    } else if (!telefoneEhValido(this.dados.telefone)) {
+      erros.telefone = 'Celular invalido.';
+    }
+    if (!this.dados.email.trim()) {
+      erros.email = 'Informe o e-mail.';
+    } else if (!emailEhValido(this.dados.email)) {
+      erros.email = 'E-mail invalido.';
+    }
+    if (!this.dados.senha.trim()) {
+      erros.senha = 'Informe a senha.';
+    }
+
+    if (Object.values(erros).some((mensagem) => mensagem !== null)) {
+      this.erros.set(erros);
       return;
     }
 
@@ -56,9 +87,20 @@ export class Cadastro {
         this.contaCriada.set(conta);
       },
       error: (falha) => {
-        this.erro.set(falha?.error?.mensagem ?? 'Nao foi possivel cadastrar a conta.');
+        this.exibirErroDaApi(falha);
         this.carregando.set(false);
       }
     });
+  }
+
+  private exibirErroDaApi(falha: any): void {
+    const campo = falha?.error?.campo as CampoErro | undefined;
+    const mensagem = falha?.error?.mensagem ?? 'Nao foi possivel cadastrar a conta.';
+
+    if (campo && campo in SEM_ERROS) {
+      this.erros.set({ ...SEM_ERROS, [campo]: mensagem });
+    } else {
+      this.erroGeral.set(mensagem);
+    }
   }
 }
