@@ -9,6 +9,7 @@ import br.com.foursys.tokenizacao.transacoes.exception.SaldoInsuficienteExceptio
 import br.com.foursys.tokenizacao.transacoes.model.Conta;
 import br.com.foursys.tokenizacao.transacoes.model.StatusConta;
 import br.com.foursys.tokenizacao.transacoes.model.TipoConta;
+import br.com.foursys.tokenizacao.transacoes.model.TipoChavePix;
 import br.com.foursys.tokenizacao.transacoes.model.TipoTransacao;
 import br.com.foursys.tokenizacao.transacoes.repository.ContaRepository;
 import br.com.foursys.tokenizacao.transacoes.repository.TransacaoRepository;
@@ -64,7 +65,7 @@ class ConcorrenciaIdempotenciaIntegrationTest extends AbstractMySqlTestcontainer
         List<Throwable> erros = executarConcorrente(20, indice -> {
             try {
                 transacaoService.processar(
-                        new TransacaoRequest(TipoTransacao.SAQUE, null, new BigDecimal("10.00"), "saque"),
+                        new TransacaoRequest(TipoTransacao.SAQUE, null, null, new BigDecimal("10.00"), "saque"),
                         "00011",
                         UUID.randomUUID().toString());
                 aprovados.incrementAndGet();
@@ -86,7 +87,7 @@ class ConcorrenciaIdempotenciaIntegrationTest extends AbstractMySqlTestcontainer
 
         List<Throwable> erros = executarConcorrente(20, indice ->
                 transacaoService.processar(
-                        new TransacaoRequest(TipoTransacao.PIX, CPF_B, new BigDecimal("10.00"), "pix"),
+                        new TransacaoRequest(TipoTransacao.PIX, CPF_B, TipoChavePix.CPF, new BigDecimal("10.00"), "pix"),
                         "00011",
                         UUID.randomUUID().toString()));
 
@@ -106,7 +107,7 @@ class ConcorrenciaIdempotenciaIntegrationTest extends AbstractMySqlTestcontainer
             String origem = deAparaB ? "00011" : "00022";
             String chaveDestino = deAparaB ? CPF_B : CPF_A;
             transacaoService.processar(
-                    new TransacaoRequest(TipoTransacao.PIX, chaveDestino, new BigDecimal("10.00"), "pix"),
+                    new TransacaoRequest(TipoTransacao.PIX, chaveDestino, TipoChavePix.CPF, new BigDecimal("10.00"), "pix"),
                     origem,
                     UUID.randomUUID().toString());
         });
@@ -127,7 +128,7 @@ class ConcorrenciaIdempotenciaIntegrationTest extends AbstractMySqlTestcontainer
 
         List<Throwable> erros = executarConcorrente(10, indice -> {
             ResultadoTransacao resultado = transacaoService.processar(
-                    new TransacaoRequest(TipoTransacao.PIX, CPF_B, new BigDecimal("100.00"), "pix"),
+                    new TransacaoRequest(TipoTransacao.PIX, CPF_B, TipoChavePix.CPF, new BigDecimal("100.00"), "pix"),
                     "00011",
                     chave);
             tokens.add(resultado.response().tokenTransacao());
@@ -148,7 +149,7 @@ class ConcorrenciaIdempotenciaIntegrationTest extends AbstractMySqlTestcontainer
 
         String chave = UUID.randomUUID().toString();
         TransacaoRequest request =
-                new TransacaoRequest(TipoTransacao.PIX, CPF_B, new BigDecimal("100.00"), "pix");
+                new TransacaoRequest(TipoTransacao.PIX, CPF_B, TipoChavePix.CPF, new BigDecimal("100.00"), "pix");
 
         ResultadoTransacao primeira = transacaoService.processar(request, "00011", chave);
         ResultadoTransacao segunda = transacaoService.processar(request, "00011", chave);
@@ -167,12 +168,32 @@ class ConcorrenciaIdempotenciaIntegrationTest extends AbstractMySqlTestcontainer
 
         String chave = UUID.randomUUID().toString();
         transacaoService.processar(
-                new TransacaoRequest(TipoTransacao.PIX, CPF_B, new BigDecimal("100.00"), "pix"),
+                new TransacaoRequest(TipoTransacao.PIX, CPF_B, TipoChavePix.CPF, new BigDecimal("100.00"), "pix"),
                 "00011",
                 chave);
 
         assertThatThrownBy(() -> transacaoService.processar(
-                new TransacaoRequest(TipoTransacao.PIX, CPF_B, new BigDecimal("200.00"), "pix"),
+                new TransacaoRequest(TipoTransacao.PIX, CPF_B, TipoChavePix.CPF, new BigDecimal("200.00"), "pix"),
+                "00011",
+                chave))
+                .isInstanceOf(PayloadIdempotenciaDivergenteException.class);
+
+        assertThat(saldo("00011")).isEqualByComparingTo("900.00");
+    }
+
+    @Test
+    void mesmaChaveComTipoDeChavePixDiferenteRetorna422() {
+        criarConta("00011", CPF_A, "a@teste.com", new BigDecimal("1000.00"), StatusConta.ATIVA);
+        criarConta("00022", CPF_B, "b@teste.com", new BigDecimal("1000.00"), StatusConta.ATIVA);
+
+        String chave = UUID.randomUUID().toString();
+        transacaoService.processar(
+                new TransacaoRequest(TipoTransacao.PIX, CPF_B, TipoChavePix.CPF, new BigDecimal("100.00"), "pix"),
+                "00011",
+                chave);
+
+        assertThatThrownBy(() -> transacaoService.processar(
+                new TransacaoRequest(TipoTransacao.PIX, CPF_B, TipoChavePix.CELULAR, new BigDecimal("100.00"), "pix"),
                 "00011",
                 chave))
                 .isInstanceOf(PayloadIdempotenciaDivergenteException.class);
@@ -216,6 +237,7 @@ class ConcorrenciaIdempotenciaIntegrationTest extends AbstractMySqlTestcontainer
                 .numeroConta(numero)
                 .nomeTitular("Titular " + numero)
                 .cpf(cpf)
+                .telefone("119" + String.format("%08d", Long.parseLong(numero)))
                 .email(email)
                 .tipoConta(TipoConta.CORRENTE)
                 .saldoConta(saldo)

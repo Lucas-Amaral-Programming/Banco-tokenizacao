@@ -6,8 +6,11 @@ import br.com.foursys.tokenizacao.transacoes.exception.ContaNaoEncontradaExcepti
 import br.com.foursys.tokenizacao.transacoes.exception.CpfInvalidoException;
 import br.com.foursys.tokenizacao.transacoes.exception.CpfJaCadastradoException;
 import br.com.foursys.tokenizacao.transacoes.exception.EmailJaCadastradoException;
+import br.com.foursys.tokenizacao.transacoes.exception.TelefoneInvalidoException;
+import br.com.foursys.tokenizacao.transacoes.exception.TelefoneJaCadastradoException;
 import br.com.foursys.tokenizacao.transacoes.model.Conta;
 import br.com.foursys.tokenizacao.transacoes.util.ValidadorCpf;
+import br.com.foursys.tokenizacao.transacoes.util.ValidadorTelefone;
 import br.com.foursys.tokenizacao.transacoes.model.StatusConta;
 import br.com.foursys.tokenizacao.transacoes.repository.ContaRepository;
 import java.math.BigDecimal;
@@ -34,8 +37,15 @@ public class ContaService {
         if (!ValidadorCpf.ehValido(cpf)) {
             throw new CpfInvalidoException();
         }
+        String telefone = apenasDigitos(request.telefone());
+        if (!ValidadorTelefone.ehValido(telefone)) {
+            throw new TelefoneInvalidoException();
+        }
         if (contaRepository.existsByCpf(cpf)) {
             throw new CpfJaCadastradoException();
+        }
+        if (contaRepository.existsByTelefone(telefone)) {
+            throw new TelefoneJaCadastradoException();
         }
         if (contaRepository.existsByEmail(request.email())) {
             throw new EmailJaCadastradoException();
@@ -45,6 +55,7 @@ public class ContaService {
                 .numeroConta(gerarNumeroConta())
                 .nomeTitular(request.nomeTitular())
                 .cpf(cpf)
+                .telefone(telefone)
                 .email(request.email())
                 .tipoConta(request.tipoConta())
                 .saldoConta(BigDecimal.ZERO)

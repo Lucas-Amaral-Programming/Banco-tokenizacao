@@ -23,6 +23,10 @@
           <rect x="3" y="5" width="18" height="14" rx="2" />
           <path d="M3 7l9 6 9-6" />
         }
+        @case ('celular') {
+          <rect x="7" y="3" width="10" height="18" rx="2" />
+          <path d="M11 18h2" />
+        }
       }
     </svg>
 
@@ -35,8 +39,8 @@
     } @else {
       <input [type]="tipoInput" [value]="valor()" (input)="atualizar($event)"
              [placeholder]="placeholder()"
-             [attr.inputmode]="mascara() === 'cpf' || mascara() === 'moeda' ? 'numeric' : null"
-             [attr.maxlength]="mascara() === 'cpf' ? 14 : mascara() === 'moeda' ? 20 : null" />
+             [attr.inputmode]="mascara() === 'cpf' || mascara() === 'celular' || mascara() === 'moeda' ? 'numeric' : null"
+             [attr.maxlength]="mascara() === 'cpf' ? 14 : mascara() === 'celular' ? 15 : mascara() === 'moeda' ? 20 : null" />
     }
 
     @if (tipo() === 'senha') {

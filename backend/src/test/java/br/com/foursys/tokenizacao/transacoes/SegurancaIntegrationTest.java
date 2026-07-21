@@ -12,6 +12,7 @@ import br.com.foursys.tokenizacao.transacoes.dto.request.LoginContaRequest;
 import br.com.foursys.tokenizacao.transacoes.dto.request.TransacaoRequest;
 import br.com.foursys.tokenizacao.transacoes.model.Conta;
 import br.com.foursys.tokenizacao.transacoes.model.StatusConta;
+import br.com.foursys.tokenizacao.transacoes.model.TipoChavePix;
 import br.com.foursys.tokenizacao.transacoes.model.TipoConta;
 import br.com.foursys.tokenizacao.transacoes.model.TipoTransacao;
 import br.com.foursys.tokenizacao.transacoes.repository.ContaRepository;
@@ -122,7 +123,7 @@ class SegurancaIntegrationTest {
                 .andExpect(status().isCreated());
 
         String cpfTerceiro = "52998224725";
-        cadastrar("Novo Cliente", cpfTerceiro, "novo@teste.com");
+        cadastrar("Novo Cliente", cpfTerceiro, "11977770001", "novo@teste.com");
         MockHttpSession sessaoTerceiro = login(cpfTerceiro, SENHA);
 
         MvcResult resultado = mvc.perform(get("/api/transacoes").session(sessaoTerceiro))
@@ -156,7 +157,7 @@ class SegurancaIntegrationTest {
     @Test
     void fluxoCompletoCadastroLoginTransacaoExtratoLogout() throws Exception {
         String cpf = "52998224725";
-        String numeroConta = cadastrar("Cliente E2E", cpf, "e2e@teste.com");
+        String numeroConta = cadastrar("Cliente E2E", cpf, "11977770002", "e2e@teste.com");
 
         MockHttpSession sessao = login(cpf, SENHA);
 
@@ -186,9 +187,9 @@ class SegurancaIntegrationTest {
         return (MockHttpSession) resultado.getRequest().getSession(false);
     }
 
-    private String cadastrar(String nome, String cpf, String email) throws Exception {
+    private String cadastrar(String nome, String cpf, String telefone, String email) throws Exception {
         CadastroContaRequest request =
-                new CadastroContaRequest(nome, cpf, email, TipoConta.CORRENTE, SENHA);
+                new CadastroContaRequest(nome, cpf, telefone, email, TipoConta.CORRENTE, SENHA);
         MvcResult resultado = mvc.perform(post("/api/contas").with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
@@ -203,8 +204,9 @@ class SegurancaIntegrationTest {
     }
 
     private String transacaoJson(TipoTransacao tipo, String destino, String valor) throws Exception {
+        TipoChavePix tipoChavePix = tipo == TipoTransacao.PIX ? TipoChavePix.CPF : null;
         return objectMapper.writeValueAsString(
-                new TransacaoRequest(tipo, destino, new BigDecimal(valor), "teste"));
+                new TransacaoRequest(tipo, destino, tipoChavePix, new BigDecimal(valor), "teste"));
     }
 
     private Conta criarConta(String numero, String cpf, String email, StatusConta status) {
@@ -212,6 +214,7 @@ class SegurancaIntegrationTest {
                 .numeroConta(numero)
                 .nomeTitular("Titular " + numero)
                 .cpf(cpf)
+                .telefone("119" + String.format("%08d", Long.parseLong(numero)))
                 .email(email)
                 .tipoConta(TipoConta.CORRENTE)
                 .saldoConta(new BigDecimal("5000.00"))

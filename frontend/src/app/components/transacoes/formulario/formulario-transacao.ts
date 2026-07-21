@@ -1,7 +1,7 @@
 import { Component, computed, inject, input, signal } from '@angular/core';
 import { Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { TipoTransacao, TransacaoRequest } from '../../../models/transacao-request.model';
+import { TipoChavePix, TipoTransacao, TransacaoRequest } from '../../../models/transacao-request.model';
 import { TransacaoResponse } from '../../../models/transacao-response.model';
 import { TransacaoService } from '../../../services/transacao.service';
 import { ContaService } from '../../../services/conta.service';
@@ -170,15 +170,17 @@ export class FormularioTransacao {
           ? this.numeroContaDestino
           : '';
     const valor = this.paraNumero(this.valorTransacaoTexto);
+    const tipoChavePix: TipoChavePix | null = tipo === 'PIX' ? this.tipoChave() : null;
 
     const request: TransacaoRequest = {
       tipoTransacao: tipo,
       numeroContaDestino: destino,
+      tipoChavePix,
       valorTransacao: valor,
       descricaoTransacao: this.descricao
     };
 
-    const chave = this.obterChaveIdempotencia(tipo, destino, valor);
+    const chave = this.obterChaveIdempotencia(tipo, destino, tipoChavePix, valor);
 
     this.resposta.set(null);
     this.erro.set(null);
@@ -198,8 +200,13 @@ export class FormularioTransacao {
     });
   }
 
-  private obterChaveIdempotencia(tipo: string, destino: string, valor: number): string {
-    const assinatura = `${tipo}|${destino}|${valor}`;
+  private obterChaveIdempotencia(
+    tipo: string,
+    destino: string,
+    tipoChavePix: TipoChavePix | null,
+    valor: number
+  ): string {
+    const assinatura = `${tipo}|${destino}|${tipoChavePix ?? ''}|${valor}`;
     if (!this.chaveIdempotencia || this.assinaturaChave !== assinatura) {
       this.chaveIdempotencia = crypto.randomUUID();
       this.assinaturaChave = assinatura;

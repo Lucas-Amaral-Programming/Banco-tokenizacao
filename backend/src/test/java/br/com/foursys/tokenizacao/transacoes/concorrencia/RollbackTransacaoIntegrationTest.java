@@ -11,6 +11,7 @@ import br.com.foursys.tokenizacao.transacoes.dto.request.TransacaoRequest;
 import br.com.foursys.tokenizacao.transacoes.model.Conta;
 import br.com.foursys.tokenizacao.transacoes.model.StatusConta;
 import br.com.foursys.tokenizacao.transacoes.model.TipoConta;
+import br.com.foursys.tokenizacao.transacoes.model.TipoChavePix;
 import br.com.foursys.tokenizacao.transacoes.model.TipoTransacao;
 import br.com.foursys.tokenizacao.transacoes.model.Transacao;
 import br.com.foursys.tokenizacao.transacoes.repository.ContaRepository;
@@ -56,7 +57,7 @@ class RollbackTransacaoIntegrationTest extends AbstractMySqlTestcontainers {
         criarConta("00022", "22222222222", "b@teste.com", new BigDecimal("1000.00"));
 
         assertThatThrownBy(() -> transacaoService.processar(
-                new TransacaoRequest(TipoTransacao.PIX, "22222222222", new BigDecimal("100.00"), "pix"),
+                new TransacaoRequest(TipoTransacao.PIX, "22222222222", TipoChavePix.CPF, new BigDecimal("100.00"), "pix"),
                 "00011",
                 UUID.randomUUID().toString()))
                 .isInstanceOf(RuntimeException.class);
@@ -74,6 +75,7 @@ class RollbackTransacaoIntegrationTest extends AbstractMySqlTestcontainers {
                 .numeroConta(numero)
                 .nomeTitular("Titular " + numero)
                 .cpf(cpf)
+                .telefone("119" + String.format("%08d", Long.parseLong(numero)))
                 .email(email)
                 .tipoConta(TipoConta.CORRENTE)
                 .saldoConta(saldo)

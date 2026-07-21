@@ -1,8 +1,8 @@
 import { Component, input, model, signal } from '@angular/core';
 
-export type IconeCampo = 'usuario' | 'documento' | 'banco' | 'cadeado' | 'email';
+export type IconeCampo = 'usuario' | 'documento' | 'banco' | 'cadeado' | 'email' | 'celular';
 export type TipoCampo = 'texto' | 'senha' | 'select';
-export type MascaraCampo = 'cpf' | 'moeda' | 'chave-pix' | null;
+export type MascaraCampo = 'cpf' | 'celular' | 'moeda' | 'chave-pix' | null;
 
 @Component({
   selector: 'app-campo-formulario',
@@ -38,6 +38,9 @@ export class CampoFormulario {
     if (this.mascara() === 'cpf') {
       valorAtual = this.formatarCpf(valorAtual);
       alvo.value = valorAtual;
+    } else if (this.mascara() === 'celular') {
+      valorAtual = this.formatarTelefone(valorAtual);
+      alvo.value = valorAtual;
     } else if (this.mascara() === 'moeda') {
       valorAtual = this.formatarMoeda(valorAtual);
       alvo.value = valorAtual;
@@ -65,6 +68,20 @@ export class CampoFormulario {
       return `${digitos.slice(0, 3)}.${digitos.slice(3, 6)}.${digitos.slice(6)}`;
     }
     return `${digitos.slice(0, 3)}.${digitos.slice(3, 6)}.${digitos.slice(6, 9)}-${digitos.slice(9)}`;
+  }
+
+  private formatarTelefone(valor: string): string {
+    const digitos = valor.replace(/\D/g, '').slice(0, 11);
+    if (digitos.length === 0) {
+      return '';
+    }
+    if (digitos.length <= 2) {
+      return `(${digitos}`;
+    }
+    if (digitos.length <= 7) {
+      return `(${digitos.slice(0, 2)}) ${digitos.slice(2)}`;
+    }
+    return `(${digitos.slice(0, 2)}) ${digitos.slice(2, 7)}-${digitos.slice(7)}`;
   }
 
   private formatarMoeda(valor: string): string {

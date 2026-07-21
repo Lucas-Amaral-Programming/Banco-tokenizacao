@@ -15,6 +15,7 @@ public final class FingerprintRequisicao {
         String base = String.join("|",
                 normalizarTipo(request),
                 normalizarTexto(request.numeroContaDestino()),
+                normalizarTipoChavePix(request),
                 normalizarValor(request.valorTransacao()),
                 normalizarTexto(request.descricaoTransacao()));
         return sha256(base);
@@ -22,6 +23,10 @@ public final class FingerprintRequisicao {
 
     private static String normalizarTipo(TransacaoRequest request) {
         return request.tipoTransacao() == null ? "" : request.tipoTransacao().name();
+    }
+
+    private static String normalizarTipoChavePix(TransacaoRequest request) {
+        return request.tipoChavePix() == null ? "" : request.tipoChavePix().name();
     }
 
     private static String normalizarTexto(String valor) {

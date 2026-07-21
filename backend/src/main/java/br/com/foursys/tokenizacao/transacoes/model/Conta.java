@@ -41,6 +41,9 @@ public class Conta {
     @Column(name = "cpf", nullable = false, length = 14)
     private String cpf;
 
+    @Column(name = "telefone", nullable = false, unique = true, length = 11)
+    private String telefone;
+
     @Column(name = "email", unique = true, length = 120)
     private String email;
 

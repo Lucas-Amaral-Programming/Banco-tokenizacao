@@ -4,6 +4,7 @@ import { CadastroContaRequest, ContaResponse, TipoConta } from '../../models/con
 import { ContaService } from '../../services/conta.service';
 import { cpfEhValido } from '../../utils/cpf';
 import { emailEhValido } from '../../utils/email';
+import { telefoneEhValido } from '../../utils/telefone';
 import { CampoFormulario } from '../shared/campo-formulario/campo-formulario';
 import { LayoutAuth } from '../shared/layout-auth/layout-auth';
 
@@ -21,6 +22,7 @@ export class Cadastro {
   protected dados: CadastroContaRequest = {
     nomeTitular: '',
     cpf: '',
+    telefone: '',
     email: '',
     tipoConta: 'CORRENTE',
     senha: ''
@@ -35,6 +37,10 @@ export class Cadastro {
 
     if (!cpfEhValido(this.dados.cpf)) {
       this.erro.set('CPF invalido.');
+      return;
+    }
+    if (!telefoneEhValido(this.dados.telefone)) {
+      this.erro.set('Celular invalido.');
       return;
     }
     if (!emailEhValido(this.dados.email)) {

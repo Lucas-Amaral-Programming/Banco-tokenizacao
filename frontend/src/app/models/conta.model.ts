@@ -10,6 +10,7 @@ export interface LoginContaRequest {
 export interface CadastroContaRequest {
   nomeTitular: string;
   cpf: string;
+  telefone: string;
   email: string;
   tipoConta: TipoConta;
   senha: string;

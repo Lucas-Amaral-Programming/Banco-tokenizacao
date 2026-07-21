@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS conta (
     numero_conta       VARCHAR(20)   NOT NULL,
     nome_titular       VARCHAR(120)  NOT NULL,
     cpf                VARCHAR(14)   NOT NULL,
+    telefone           VARCHAR(11)   NOT NULL,
     email              VARCHAR(120),
     tipo_conta         VARCHAR(20)   NOT NULL,
     saldo_conta        DECIMAL(15,2) NOT NULL DEFAULT 0.00,
@@ -19,6 +20,7 @@ CREATE TABLE IF NOT EXISTS conta (
     PRIMARY KEY (id_conta),
     CONSTRAINT uk_numero_conta UNIQUE (numero_conta),
     CONSTRAINT uk_cpf UNIQUE (cpf),
+    CONSTRAINT uk_telefone UNIQUE (telefone),
     CONSTRAINT uk_email UNIQUE (email),
     CONSTRAINT ck_saldo_nao_negativo CHECK (saldo_conta >= 0)
 );

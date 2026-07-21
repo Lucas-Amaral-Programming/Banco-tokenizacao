@@ -9,6 +9,8 @@ import br.com.foursys.tokenizacao.transacoes.exception.ContaNaoEncontradaExcepti
 import br.com.foursys.tokenizacao.transacoes.exception.ContaOrigemObrigatoriaException;
 import br.com.foursys.tokenizacao.transacoes.exception.ContasIguaisException;
 import br.com.foursys.tokenizacao.transacoes.exception.PayloadIdempotenciaDivergenteException;
+import br.com.foursys.tokenizacao.transacoes.exception.TipoChavePixNaoPermitidoException;
+import br.com.foursys.tokenizacao.transacoes.exception.TipoChavePixObrigatorioException;
 import br.com.foursys.tokenizacao.transacoes.exception.TipoTransacaoObrigatorioException;
 import br.com.foursys.tokenizacao.transacoes.exception.ValorTransacaoInvalidoException;
 import br.com.foursys.tokenizacao.transacoes.model.Conta;
@@ -123,9 +125,20 @@ public class ProcessadorTransacao {
         if (request.tipoTransacao() == null) {
             throw new TipoTransacaoObrigatorioException();
         }
+        validarTipoChavePix(request);
         if (request.valorTransacao() == null
                 || request.valorTransacao().compareTo(BigDecimal.ZERO) <= 0) {
             throw new ValorTransacaoInvalidoException();
+        }
+    }
+
+    private void validarTipoChavePix(TransacaoRequest request) {
+        if (request.tipoTransacao() == TipoTransacao.PIX) {
+            if (request.tipoChavePix() == null) {
+                throw new TipoChavePixObrigatorioException();
+            }
+        } else if (request.tipoChavePix() != null) {
+            throw new TipoChavePixNaoPermitidoException();
         }
     }
 
