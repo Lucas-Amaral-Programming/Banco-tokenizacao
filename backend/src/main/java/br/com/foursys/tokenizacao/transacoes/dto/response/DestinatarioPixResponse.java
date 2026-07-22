@@ -4,6 +4,7 @@ import br.com.foursys.tokenizacao.transacoes.model.TipoChavePix;
 
 public record DestinatarioPixResponse(
         String nomeTitular,
+        String cpfMascarado,
         TipoChavePix tipoChavePix
 ) {
 }

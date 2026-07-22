@@ -40,7 +40,7 @@ let ultimaResolucao: ResolverChavePixRequest | null;
 function criarComponente(
   tipo: string,
   resolver: (request: ResolverChavePixRequest) => Observable<DestinatarioPixResponse> =
-    () => of({ nomeTitular: 'Ana Souza', tipoChavePix: 'CELULAR' })
+    () => of({ nomeTitular: 'Ana Souza', cpfMascarado: '111.***.***-11', tipoChavePix: 'CELULAR' })
 ) {
   ultimaChamada = null;
   ultimaResolucao = null;
@@ -90,13 +90,13 @@ describe('FormularioTransacao', () => {
   });
 
   describe('resolucao do tipo pela rota', () => {
-    it('reconhece PIX, DEPOSITO e SAQUE (inclusive minusculo)', () => {
+    it('reconhece PIX inclusive em minusculo', () => {
       expect(criarComponente('pix').component.tipoTransacao()).toBe('PIX');
-      expect(criarComponente('DEPOSITO').component.tipoTransacao()).toBe('DEPOSITO');
-      expect(criarComponente('saque').component.tipoTransacao()).toBe('SAQUE');
     });
 
-    it('retorna null para tipo invalido', () => {
+    it('retorna null para operacoes fora do canal PIX', () => {
+      expect(criarComponente('DEPOSITO').component.tipoTransacao()).toBeNull();
+      expect(criarComponente('saque').component.tipoTransacao()).toBeNull();
       expect(criarComponente('boleto').component.tipoTransacao()).toBeNull();
     });
   });
@@ -106,18 +106,6 @@ describe('FormularioTransacao', () => {
       const { component } = criarComponente('PIX');
       expect(component.exigeOrigem()).toBe(true);
       expect(component.exigeDestino()).toBe(true);
-    });
-
-    it('DEPOSITO exige apenas destino', () => {
-      const { component } = criarComponente('DEPOSITO');
-      expect(component.exigeOrigem()).toBe(false);
-      expect(component.exigeDestino()).toBe(true);
-    });
-
-    it('SAQUE exige apenas origem', () => {
-      const { component } = criarComponente('SAQUE');
-      expect(component.exigeOrigem()).toBe(true);
-      expect(component.exigeDestino()).toBe(false);
     });
   });
 
@@ -135,7 +123,7 @@ describe('FormularioTransacao', () => {
 
     it('detecta e formata CPF valido sem regra de celular', () => {
       const { component } = criarComponente('PIX', (request) =>
-        of({ nomeTitular: 'Ana Souza', tipoChavePix: request.tipoChavePix }));
+        of({ nomeTitular: 'Ana Souza', cpfMascarado: '111.***.***-11', tipoChavePix: request.tipoChavePix }));
       const exibido = digitar((e) => component.aoDigitarChave(e), '12345678909');
 
       expect(component.estadoChave()).toBe('CPF');
@@ -145,7 +133,7 @@ describe('FormularioTransacao', () => {
 
     it('detecta e formata celular que nao e CPF valido', () => {
       const { component } = criarComponente('PIX', (request) =>
-        of({ nomeTitular: 'Ana Souza', tipoChavePix: request.tipoChavePix }));
+        of({ nomeTitular: 'Ana Souza', cpfMascarado: '111.***.***-11', tipoChavePix: request.tipoChavePix }));
       const exibido = digitar((e) => component.aoDigitarChave(e), '11987654321');
 
       expect(component.estadoChave()).toBe('CELULAR');
@@ -155,7 +143,7 @@ describe('FormularioTransacao', () => {
 
     it('pede escolha quando a chave pode ser CPF ou celular', () => {
       const { component } = criarComponente('PIX', (request) =>
-        of({ nomeTitular: 'Ana Souza', tipoChavePix: request.tipoChavePix }));
+        of({ nomeTitular: 'Ana Souza', cpfMascarado: '111.***.***-11', tipoChavePix: request.tipoChavePix }));
       const exibido = digitar((e) => component.aoDigitarChave(e), '52998224725');
 
       expect(component.estadoChave()).toBe('AMBIGUA');
@@ -178,7 +166,7 @@ describe('FormularioTransacao', () => {
 
     it('trunca colagem numerica e volta a indefinida ao apagar', () => {
       const { component } = criarComponente('PIX', (request) =>
-        of({ nomeTitular: 'Ana Souza', tipoChavePix: request.tipoChavePix }));
+        of({ nomeTitular: 'Ana Souza', cpfMascarado: '111.***.***-11', tipoChavePix: request.tipoChavePix }));
       digitar((e) => component.aoDigitarChave(e), '11987654321999');
       expect(component.numeroContaDestino).toBe('11987654321');
 
@@ -196,8 +184,8 @@ describe('FormularioTransacao', () => {
 
       digitar((e) => component.aoDigitarChave(e), '11987654321');
       digitar((e) => component.aoDigitarChave(e), 'novo@email.com');
-      segunda.next({ nomeTitular: 'Destinatario atual', tipoChavePix: 'EMAIL' });
-      primeira.next({ nomeTitular: 'Resposta antiga', tipoChavePix: 'CELULAR' });
+      segunda.next({ nomeTitular: 'Destinatario atual', cpfMascarado: '222.***.***-22', tipoChavePix: 'EMAIL' });
+      primeira.next({ nomeTitular: 'Resposta antiga', cpfMascarado: '333.***.***-33', tipoChavePix: 'CELULAR' });
 
       expect(component.nomeDestinatario).toBe('Destinatario atual');
     });
@@ -205,7 +193,7 @@ describe('FormularioTransacao', () => {
 
   describe('mascaras e valores', () => {
     it('formata o valor como moeda ao digitar', () => {
-      const { component } = criarComponente('DEPOSITO');
+      const { component } = criarComponente('PIX');
       const exibido = digitar((e) => component.aoDigitarValor(e), '12345');
       expect(exibido).toBe('R$ 123,45');
     });
@@ -221,7 +209,7 @@ describe('FormularioTransacao', () => {
   describe('envio da transacao', () => {
     it('PIX envia chave normalizada e tipo detectado', () => {
       const { component } = criarComponente('PIX', (request) =>
-        of({ nomeTitular: 'Ana Souza', tipoChavePix: request.tipoChavePix }));
+        of({ nomeTitular: 'Ana Souza', cpfMascarado: '111.***.***-11', tipoChavePix: request.tipoChavePix }));
       digitar((e) => component.aoDigitarChave(e), '11987654321');
       component.valorTransacaoTexto = 'R$ 50,00';
 
@@ -245,29 +233,19 @@ describe('FormularioTransacao', () => {
       expect(component.erro()).toBeTruthy();
     });
 
-    it('DEPOSITO credita a propria conta logada', () => {
+    it('nao envia operacao fora do canal PIX', () => {
       const { component } = criarComponente('DEPOSITO');
       component.valorTransacaoTexto = 'R$ 200,00';
 
       component.enviar();
 
-      expect(ultimaChamada?.request.numeroContaDestino).toBe(CONTA_LOGADA.numeroConta);
-      expect(ultimaChamada?.request.valorTransacao).toBe(200);
-    });
-
-    it('SAQUE nao informa conta de destino', () => {
-      const { component } = criarComponente('SAQUE');
-      component.valorTransacaoTexto = 'R$ 30,00';
-
-      component.enviar();
-
-      expect(ultimaChamada?.request.numeroContaDestino).toBe('');
-      expect(ultimaChamada?.request.valorTransacao).toBe(30);
+      expect(ultimaChamada).toBeNull();
+      expect(component.erro()).toBe('Operacao indisponivel para o canal do cliente.');
     });
 
     it('limpa os campos apos o envio bem-sucedido', () => {
       const { component } = criarComponente('PIX', (request) =>
-        of({ nomeTitular: 'Ana Souza', tipoChavePix: request.tipoChavePix }));
+        of({ nomeTitular: 'Ana Souza', cpfMascarado: '111.***.***-11', tipoChavePix: request.tipoChavePix }));
       digitar((e) => component.aoDigitarChave(e), '11987654321');
       component.valorTransacaoTexto = 'R$ 50,00';
       component.descricao = 'almoco';
@@ -286,7 +264,7 @@ describe('FormularioTransacao', () => {
   describe('etapas e avisos', () => {
     it('avanca para a etapa de valor apos resolver a chave', () => {
       const { component } = criarComponente('PIX', (request) =>
-        of({ nomeTitular: 'Ana Souza', tipoChavePix: request.tipoChavePix }));
+        of({ nomeTitular: 'Ana Souza', cpfMascarado: '111.***.***-11', tipoChavePix: request.tipoChavePix }));
       digitar((e) => component.aoDigitarChave(e), '11987654321');
       expect(component.destinatarioResolvido()).toBe(true);
 
@@ -305,7 +283,7 @@ describe('FormularioTransacao', () => {
       const { component } = criarComponente('PIX');
 
       component.mostrarEmBreve();
-      expect(component.aviso()).toBe('Disponivel em breve.');
+      expect(component.aviso.mensagem()).toBe('Disponivel em breve.');
     });
   });
 });

@@ -6,6 +6,7 @@ import br.com.foursys.tokenizacao.transacoes.dto.response.DestinatarioPixRespons
 import br.com.foursys.tokenizacao.transacoes.model.Conta;
 import br.com.foursys.tokenizacao.transacoes.security.ContaPrincipal;
 import br.com.foursys.tokenizacao.transacoes.service.ChavePixService;
+import br.com.foursys.tokenizacao.transacoes.util.MascaraCpf;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -28,7 +29,10 @@ public class ChavePixController {
     @PostMapping("/resolver")
     public ResponseEntity<DestinatarioPixResponse> resolver(@RequestBody ResolverChavePixRequest request) {
         Conta conta = chavePixService.resolver(request.tipoChavePix(), request.chave());
-        return ResponseEntity.ok(new DestinatarioPixResponse(conta.getNomeTitular(), request.tipoChavePix()));
+        return ResponseEntity.ok(new DestinatarioPixResponse(
+                conta.getNomeTitular(),
+                MascaraCpf.mascarar(conta.getCpf()),
+                request.tipoChavePix()));
     }
 
     @GetMapping

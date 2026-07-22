@@ -131,11 +131,21 @@
       <form class="form" layout-conteudo (ngSubmit)="enviar()">
         <button class="voltar-chave" type="button" (click)="voltarParaChave()">
           <app-icone nome="seta-esquerda" [tamanho]="18" />
-          Enviando para <strong>{{ nomeDestinatario }}</strong>
+          Trocar destinatário
         </button>
 
+        <section class="cartao destinatario">
+          <span class="destinatario__rotulo">Para</span>
+          <strong class="destinatario__nome">{{ nomeDestinatario }}</strong>
+          <span class="destinatario__cpf">CPF {{ cpfDestinatario }}</span>
+          <span class="destinatario__chave">
+            <app-icone class="destinatario__ic" [nome]="iconeChave()" [tamanho]="18" />
+            {{ rotuloTipoChave() }}: {{ chaveExibida }}
+          </span>
+        </section>
+
         <section class="cartao">
-          <h2 class="cartao__titulo">2. Valor</h2>
+          <h2 class="cartao__titulo">Valor</h2>
 
           <label class="campo">
             <span class="campo__rotulo">Valor a pagar</span>
@@ -163,6 +173,43 @@
           </label>
         </section>
 
+        <section class="cartao saldo">
+          <div class="saldo__topo">
+            <span class="saldo__rotulo">Saldo em conta</span>
+            <button
+              class="saldo__olho"
+              type="button"
+              (click)="alternarSaldo()"
+              [attr.aria-label]="saldoOculto() ? 'Mostrar saldo' : 'Ocultar saldo'"
+            >
+              @if (saldoOculto()) {
+                <app-icone nome="olho-fechado" [tamanho]="20" />
+              } @else {
+                <app-icone nome="olho" [tamanho]="20" />
+              }
+            </button>
+          </div>
+
+          <strong class="saldo__valor">
+            @if (saldoOculto()) {
+              R$ ●●●●●●
+            } @else {
+              {{ saldoDisponivel() | currency: 'BRL' : 'symbol' : '1.2-2' }}
+            }
+          </strong>
+
+          <span class="saldo__limite">
+            Saldo + limite:
+            <strong>
+              @if (saldoOculto()) {
+                R$ ●●●●●●
+              } @else {
+                {{ saldoComLimite() | currency: 'BRL' : 'symbol' : '1.2-2' }}
+              }
+            </strong>
+          </span>
+        </section>
+
         <p class="nota">
           <app-icone class="nota__ic" nome="shield" [tamanho]="20" />
           Confira os dados antes de confirmar a transferência.
@@ -174,168 +221,20 @@
             {{ carregando() ? 'Enviando...' : 'Continuar' }}
           </button>
         </div>
-
-        @if (resposta(); as transacao) {
-          <div class="resultado resultado--ok">
-            <strong>Transação {{ transacao.statusTransacao }}</strong>
-            <span>Token: {{ transacao.tokenTransacao }}</span>
-          </div>
-        }
-        @if (erro(); as mensagem) {
-          <div class="resultado resultado--erro">{{ mensagem }}</div>
-        }
       </form>
     }
 
-    @if (aviso(); as msg) {
-      <p class="toast" role="status">{{ msg }}</p>
+    @if (resposta(); as transacao) {
+      <div class="resultado resultado--ok" layout-conteudo>
+        <strong>Transação {{ transacao.statusTransacao }}</strong>
+        <span>Token: {{ transacao.tokenTransacao }}</span>
+      </div>
+    }
+    @if (erro(); as mensagem) {
+      <div class="resultado resultado--erro" layout-conteudo>{{ mensagem }}</div>
     }
 
-    <app-bottom-nav layout-navegacao />
-  </app-layout-banco>
-} @else if (tipoTransacao() === 'DEPOSITO') {
-  <app-layout-banco>
-    <header class="hero" layout-cabecalho>
-      <div class="hero__top">
-        <button class="icon-btn" type="button" (click)="voltar()" aria-label="Voltar">
-          <app-icone nome="seta-esquerda" [tamanho]="22" />
-        </button>
-        <img class="hero__logo" src="logo-foursys.png" alt="foursys" />
-        <button class="icon-btn" type="button" aria-label="Ajuda">
-          <app-icone nome="ajuda" [tamanho]="22" />
-        </button>
-      </div>
-
-      <h1 class="hero__titulo">Depósito</h1>
-
-      <app-conta-origem [conta]="contaAtual()" rotulo="Conta de destino" icone="deposito" />
-    </header>
-
-      <form class="form" layout-conteudo (ngSubmit)="enviar()">
-        <section class="cartao">
-          <h2 class="cartao__titulo">Valor</h2>
-
-          <label class="campo">
-            <span class="campo__rotulo">Valor a depositar</span>
-            <span class="campo__entrada campo__entrada--valor">
-              <input
-                class="campo__valor"
-                [value]="valorTransacaoTexto"
-                (input)="aoDigitarValor($event)"
-                inputmode="numeric"
-              />
-            </span>
-          </label>
-
-          <label class="campo">
-            <span class="campo__rotulo">Descrição (opcional)</span>
-            <span class="campo__entrada">
-              <app-icone class="campo__ic" nome="chat" [tamanho]="20" />
-              <input [(ngModel)]="descricao" name="descricao" placeholder="Ex: depósito em dinheiro" />
-              @if (descricao) {
-                <button class="campo__limpar" type="button" (click)="limparDescricao()" aria-label="Limpar">
-                  <app-icone nome="x" [tamanho]="18" />
-                </button>
-              }
-            </span>
-          </label>
-        </section>
-
-        <p class="nota">
-          <app-icone class="nota__ic" nome="shield" [tamanho]="20" />
-          Confira os dados antes de confirmar o depósito.
-        </p>
-
-        <div class="acoes">
-          <button class="btn btn--outline" type="button">Revisar</button>
-          <button class="btn btn--primario" type="submit" [disabled]="!podeEnviar()">
-            {{ carregando() ? 'Enviando...' : 'Continuar' }}
-          </button>
-        </div>
-
-        @if (resposta(); as transacao) {
-          <div class="resultado resultado--ok">
-            <strong>Transação {{ transacao.statusTransacao }}</strong>
-            <span>Token: {{ transacao.tokenTransacao }}</span>
-          </div>
-        }
-        @if (erro(); as mensagem) {
-          <div class="resultado resultado--erro">{{ mensagem }}</div>
-        }
-      </form>
-
-    <app-bottom-nav layout-navegacao />
-  </app-layout-banco>
-} @else if (tipoTransacao() === 'SAQUE') {
-  <app-layout-banco>
-    <header class="hero" layout-cabecalho>
-      <div class="hero__top">
-        <button class="icon-btn" type="button" (click)="voltar()" aria-label="Voltar">
-          <app-icone nome="seta-esquerda" [tamanho]="22" />
-        </button>
-        <img class="hero__logo" src="logo-foursys.png" alt="foursys" />
-        <button class="icon-btn" type="button" aria-label="Ajuda">
-          <app-icone nome="ajuda" [tamanho]="22" />
-        </button>
-      </div>
-
-      <h1 class="hero__titulo">Saque</h1>
-
-      <app-conta-origem [conta]="contaAtual()" rotulo="Conta de origem" />
-    </header>
-
-      <form class="form" layout-conteudo (ngSubmit)="enviar()">
-        <section class="cartao">
-          <h2 class="cartao__titulo">Valor</h2>
-
-          <label class="campo">
-            <span class="campo__rotulo">Valor a sacar</span>
-            <span class="campo__entrada campo__entrada--valor">
-              <input
-                class="campo__valor"
-                [value]="valorTransacaoTexto"
-                (input)="aoDigitarValor($event)"
-                inputmode="numeric"
-              />
-            </span>
-          </label>
-
-          <label class="campo">
-            <span class="campo__rotulo">Descrição (opcional)</span>
-            <span class="campo__entrada">
-              <app-icone class="campo__ic" nome="chat" [tamanho]="20" />
-              <input [(ngModel)]="descricao" name="descricao" placeholder="Ex: saque no caixa" />
-              @if (descricao) {
-                <button class="campo__limpar" type="button" (click)="limparDescricao()" aria-label="Limpar">
-                  <app-icone nome="x" [tamanho]="18" />
-                </button>
-              }
-            </span>
-          </label>
-        </section>
-
-        <p class="nota">
-          <app-icone class="nota__ic" nome="shield" [tamanho]="20" />
-          Confira os dados antes de confirmar o saque.
-        </p>
-
-        <div class="acoes">
-          <button class="btn btn--outline" type="button">Revisar</button>
-          <button class="btn btn--primario" type="submit" [disabled]="!podeEnviar()">
-            {{ carregando() ? 'Enviando...' : 'Continuar' }}
-          </button>
-        </div>
-
-        @if (resposta(); as transacao) {
-          <div class="resultado resultado--ok">
-            <strong>Transação {{ transacao.statusTransacao }}</strong>
-            <span>Token: {{ transacao.tokenTransacao }}</span>
-          </div>
-        }
-        @if (erro(); as mensagem) {
-          <div class="resultado resultado--erro">{{ mensagem }}</div>
-        }
-      </form>
+    <app-toast [mensagem]="aviso.mensagem()" />
 
     <app-bottom-nav layout-navegacao />
   </app-layout-banco>
