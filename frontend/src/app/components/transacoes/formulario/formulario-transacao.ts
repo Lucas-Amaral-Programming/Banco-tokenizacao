@@ -7,7 +7,7 @@ import {
   signal,
   viewChild
 } from '@angular/core';
-import { Location } from '@angular/common';
+import { CurrencyPipe, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { TipoChavePix, TipoTransacao, TransacaoRequest } from '../../../models/transacao-request.model';
@@ -16,19 +16,21 @@ import { TransacaoService } from '../../../services/transacao.service';
 import { ContaService } from '../../../services/conta.service';
 import { Icone, NomeIcone } from '../../shared/icone/icone';
 import { LayoutBanco } from '../../shared/layout-banco/layout-banco';
+import { Toast } from '../../shared/toast/toast';
 import { BottomNav } from '../../home/bottom-nav/bottom-nav';
 import { ContaOrigem } from '../conta-origem/conta-origem';
 import { cpfEhValido } from '../../../utils/cpf';
 import { emailEhValido } from '../../../utils/email';
 import { telefoneEhValido } from '../../../utils/telefone';
+import { criarAvisoTemporario } from '../../../utils/aviso-temporario';
 
-const TIPOS_VALIDOS: TipoTransacao[] = ['PIX', 'DEPOSITO', 'SAQUE'];
+const TIPOS_VALIDOS: TipoTransacao[] = ['PIX'];
 
 type EstadoChavePix = 'INDEFINIDA' | TipoChavePix | 'AMBIGUA' | 'INVALIDA';
 
 @Component({
   selector: 'app-formulario-transacao',
-  imports: [FormsModule, RouterLink, Icone, BottomNav, ContaOrigem, LayoutBanco],
+  imports: [FormsModule, RouterLink, Icone, BottomNav, ContaOrigem, LayoutBanco, Toast, CurrencyPipe],
   templateUrl: './formulario-transacao.html',
   styleUrl: './formulario-transacao.scss'
 })
@@ -48,19 +50,13 @@ export class FormularioTransacao {
       : null;
   });
 
-  protected readonly exigeOrigem = computed(() => {
-    const tipo = this.tipoTransacao();
-    return tipo === 'SAQUE' || tipo === 'PIX';
-  });
+  protected readonly exigeOrigem = computed(() => this.tipoTransacao() === 'PIX');
 
-  protected readonly exigeDestino = computed(() => {
-    const tipo = this.tipoTransacao();
-    return tipo === 'DEPOSITO' || tipo === 'PIX';
-  });
+  protected readonly exigeDestino = computed(() => this.tipoTransacao() === 'PIX');
 
   // ----- Estado especifico da tela PIX -----
   protected readonly etapa = signal<'CHAVE' | 'VALOR'>('CHAVE');
-  protected readonly aviso = signal<string | null>(null);
+  protected readonly aviso = criarAvisoTemporario();
   private readonly botaoContinuar = viewChild<ElementRef<HTMLButtonElement>>('botaoContinuar');
   private readonly inputChave = viewChild<ElementRef<HTMLInputElement>>('inputChave');
   protected readonly estadoChave = signal<EstadoChavePix>('INDEFINIDA');
@@ -68,7 +64,33 @@ export class FormularioTransacao {
   protected readonly destinatarioResolvido = signal(false);
   protected readonly erroChave = signal<string | null>(null);
   protected nomeDestinatario = '';
+  protected cpfDestinatario = '';
   private versaoConsultaDestinatario = 0;
+
+  // Cheque especial mockado: nao ha campo de limite na conta nesta fase.
+  private static readonly LIMITE_ADICIONAL = 1000;
+  protected readonly saldoOculto = signal(true);
+  protected readonly saldoDisponivel = computed(() => this.contaAtual()?.saldoConta ?? 0);
+  protected readonly saldoComLimite = computed(
+    () => this.saldoDisponivel() + FormularioTransacao.LIMITE_ADICIONAL
+  );
+
+  protected readonly rotuloTipoChave = computed(() => {
+    switch (this.tipoChave()) {
+      case 'CPF':
+        return 'CPF';
+      case 'EMAIL':
+        return 'E-mail';
+      case 'CELULAR':
+        return 'Celular';
+      default:
+        return 'Chave';
+    }
+  });
+
+  alternarSaldo(): void {
+    this.saldoOculto.update((oculto) => !oculto);
+  }
 
   protected readonly tipoChave = computed<TipoChavePix | null>(() => {
     const estado = this.estadoChave();
@@ -149,14 +171,8 @@ export class FormularioTransacao {
     setTimeout(() => this.inputChave()?.nativeElement.focus());
   }
 
-  private avisoTimeout: ReturnType<typeof setTimeout> | null = null;
-
   mostrarEmBreve(): void {
-    this.aviso.set('Disponivel em breve.');
-    if (this.avisoTimeout) {
-      clearTimeout(this.avisoTimeout);
-    }
-    this.avisoTimeout = setTimeout(() => this.aviso.set(null), 2500);
+    this.aviso.mostrar('Disponivel em breve.');
   }
 
   selecionarTipoChave(tipo: 'CPF' | 'CELULAR'): void {
@@ -230,6 +246,7 @@ export class FormularioTransacao {
           return;
         }
         this.nomeDestinatario = destinatario.nomeTitular;
+        this.cpfDestinatario = destinatario.cpfMascarado;
         this.destinatarioResolvido.set(true);
         this.consultandoDestinatario.set(false);
         setTimeout(() => this.botaoContinuar()?.nativeElement.focus());
@@ -249,6 +266,7 @@ export class FormularioTransacao {
   private invalidarDestinatario(): void {
     this.versaoConsultaDestinatario++;
     this.nomeDestinatario = '';
+    this.cpfDestinatario = '';
     this.destinatarioResolvido.set(false);
     this.consultandoDestinatario.set(false);
     this.erroChave.set(null);
@@ -276,26 +294,20 @@ export class FormularioTransacao {
   }
 
   enviar(): void {
+    if (this.tipoTransacao() !== 'PIX') {
+      this.erro.set('Operacao indisponivel para o canal do cliente.');
+      return;
+    }
+
     if (!this.podeEnviar()) {
       this.erro.set('Preencha os dados obrigatorios antes de continuar.');
       return;
     }
 
-    const tipo = this.tipoTransacao();
-    if (!tipo) {
-      this.erro.set('Tipo de transacao invalido.');
-      return;
-    }
-
-    // Deposito credita a propria conta logada.
-    const destino =
-      tipo === 'DEPOSITO'
-        ? (this.contaAtual()?.numeroConta ?? '')
-        : this.exigeDestino()
-          ? this.numeroContaDestino
-          : '';
+    const tipo = 'PIX';
+    const destino = this.numeroContaDestino;
     const valor = this.paraNumero(this.valorTransacaoTexto);
-    const tipoChavePix: TipoChavePix | null = tipo === 'PIX' ? this.tipoChave() : null;
+    const tipoChavePix = this.tipoChave();
 
     const request: TransacaoRequest = {
       tipoTransacao: tipo,

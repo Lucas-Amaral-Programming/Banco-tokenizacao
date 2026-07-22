@@ -365,16 +365,8 @@
   cursor: pointer;
 }
 
-.metodo--ativo {
-  border-color: var(--color-orange-500);
-}
-
 .metodo__ic {
   color: var(--color-text-muted);
-}
-
-.metodo__ic--pix {
-  color: #1ab89c;
 }
 
 .gerenciar {
@@ -489,17 +481,69 @@
   cursor: pointer;
 }
 
-.toast {
-  position: fixed;
-  left: 50%;
-  bottom: 96px;
-  transform: translateX(-50%);
-  margin: 0;
-  padding: var(--space-3) var(--space-4);
-  background: var(--color-text-strong);
-  color: var(--color-on-navy);
-  border-radius: var(--radius-pill);
+/* ---- Etapa 2 do PIX: destinatario e saldo ---- */
+.destinatario {
+  gap: var(--space-2);
+}
+
+.destinatario__rotulo {
   font-size: var(--fs-label);
-  box-shadow: var(--shadow-card);
-  z-index: 20;
+  color: var(--color-text-muted);
+}
+
+.destinatario__nome {
+  font-size: var(--fs-title);
+  color: var(--color-text-strong);
+}
+
+.destinatario__cpf {
+  font-size: var(--fs-label);
+  color: var(--color-text-muted);
+}
+
+.destinatario__chave {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--fs-label);
+  color: var(--color-text);
+}
+
+.destinatario__ic {
+  flex: 0 0 auto;
+  color: var(--color-orange-500);
+}
+
+.saldo {
+  gap: var(--space-2);
+}
+
+.saldo__topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.saldo__rotulo {
+  font-size: var(--fs-label);
+  color: var(--color-text-muted);
+}
+
+.saldo__olho {
+  display: inline-flex;
+  background: none;
+  border: 0;
+  padding: 0;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.saldo__valor {
+  font-size: var(--fs-title);
+  color: var(--color-text-strong);
+}
+
+.saldo__limite {
+  font-size: var(--fs-label);
+  color: var(--color-text-muted);
 }

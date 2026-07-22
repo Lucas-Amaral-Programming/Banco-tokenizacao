@@ -9,6 +9,7 @@ export interface ResolverChavePixRequest {
 
 export interface DestinatarioPixResponse {
   nomeTitular: string;
+  cpfMascarado: string;
   tipoChavePix: TipoChavePix;
 }
 
